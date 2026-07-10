@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "jobs": {
+      "$jobId": {
+        ".read": true,
+        ".write": true,
+        "metadata": {
+          ".validate": "newData.hasChildren(['id', 'title', 'location', 'experienceLevel', 'description', 'skills', 'createdAt'])"
+        },
+        "candidates": {
+          "$candidateId": {
+            ".validate": "newData.hasChildren(['personalInfo', 'experience', 'scores', 'status', 'appliedAt'])"
+          }
+        },
+        "statistics": {
+          ".validate": "newData.hasChildren(['applicantCount', 'shortlistedCount', 'avgMatchScore'])"
+        }
+      }
+    },
+    "skillEmbeddingsCache": {
+      ".read": true,
+      ".write": "auth != null"
+    }
+  }
+}

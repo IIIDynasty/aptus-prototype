@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // CV storage rules
+    match /cvs/{jobId}/{candidateId}.{extension} {
+      // Allow uploads from anyone during application submission
+      allow create: if request.resource.size <= 5 * 1024 * 1024 
+                    && (extension == 'pdf' || extension == 'docx');
+      
+      // Allow reads only for authenticated recruiters or via signed URL
+      allow read: if request.auth != null;
+    }
+    
+    // Cover letter storage rules
+    match /cover-letters/{jobId}/{candidateId}.{extension} {
+      // Allow uploads from anyone during application submission
+      allow create: if request.resource.size <= 5 * 1024 * 1024 
+                    && (extension == 'pdf' || extension == 'docx');
+      
+      // Allow reads only for authenticated recruiters or via signed URL
+      allow read: if request.auth != null;
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

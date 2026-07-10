@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Navigation</title>
+    <style>
+        .hidden { display: none !important; }
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { padding: 20px; margin: 10px; border: 2px solid #ccc; }
+        .landing { background: #f0f0f0; }
+        .recruiter { background: #e0ffe0; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Testing Aptus Navigation</h1>
+    
+    <div id="roleToggle" style="display:none;">
+        <button id="toggleRecruiter">Recruiter</button>
+        <button id="toggleCandidate">Candidate</button>
+    </div>
+
+    <section id="landingPage" class="section landing">
+        <h2>Landing Page</h2>
+        <button onclick="enterAs('recruiter')">Get Started (Enter as Recruiter)</button>
+    </section>
+
+    <div id="recruiterFlow" class="hidden section recruiter">
+        <h2>Recruiter Flow</h2>
+        <p>This is the recruiter dashboard area.</p>
+    </div>
+
+    <div id="candidateFlow" class="hidden section">
+        <h2>Candidate Flow</h2>
+        <p>This is the candidate application area.</p>
+    </div>
+
+    <script>
+        let currentRole = null;
+
+        function enterAs(role) {
+            console.log('enterAs called with role:', role);
+            
+            // Hide landing page
+            document.getElementById('landingPage').classList.add('hidden');
+            
+            // Show role toggle
+            document.getElementById('roleToggle').style.display = 'flex';
+            
+            currentRole = role;
+
+            if (role === 'recruiter') {
+                console.log('Showing recruiter flow');
+                document.getElementById('recruiterFlow').classList.remove('hidden');
+                document.getElementById('candidateFlow').classList.add('hidden');
+                document.getElementById('toggleRecruiter').style.background = '#333';
+                document.getElementById('toggleRecruiter').style.color = '#fff';
+            } else {
+                console.log('Showing candidate flow');
+                document.getElementById('candidateFlow').classList.remove('hidden');
+                document.getElementById('recruiterFlow').classList.add('hidden');
+                document.getElementById('toggleCandidate').style.background = '#333';
+                document.getElementById('toggleCandidate').style.color = '#fff';
+            }
+        }
+    </script>
+</body>
+</html>
