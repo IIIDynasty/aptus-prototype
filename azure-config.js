@@ -46,9 +46,9 @@ const config = {
     baseUrl: process.env.AZURE_FUNCTIONS_URL || 'https://YOUR_FUNCTION_APP.azurewebsites.net'
   },
 
-  // OpenAI Configuration (unchanged from Firebase version)
-  openai: {
-    apiKey: process.env.OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY'
+  // Groq AI Configuration
+  groq: {
+    apiKey: process.env.GROQ_API_KEY || 'YOUR_GROQ_API_KEY'
   }
 };
 

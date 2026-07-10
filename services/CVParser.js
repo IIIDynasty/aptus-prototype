@@ -4,13 +4,12 @@
 
 const pdf = require('pdf-parse');
 const mammoth = require('mammoth');
-const { Configuration, OpenAIApi } = require('openai');
+const Groq = require('groq-sdk');
 
-// OpenAI Configuration
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY
+// Groq AI Configuration
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
 });
-const openai = new OpenAIApi(configuration);
 
 /**
  * Extract text from PDF file
@@ -72,7 +71,7 @@ function truncateText(text, maxChars = 8000) {
 }
 
 /**
- * Parse CV using OpenAI GPT-3.5-turbo
+ * Parse CV using Groq LLaMA 3
  * Extracts structured data: skills, certifications, education, experience
  * 
  * @param {string} cvText - Extracted CV text
@@ -93,34 +92,37 @@ async function parseCVWithAI(cvText) {
 CV Text:
 ${truncatedText}
 
-Return a JSON object with this structure:
+Return ONLY a valid JSON object with this exact structure and nothing else:
 {
-  "skills": ["skill1", "skill2", ...],
-  "certifications": ["cert1", "cert2", ...],
-  "education": ["degree1", "degree2", ...],
-  "estimatedYearsOfExperience": number
+  "skills": ["skill1", "skill2"],
+  "certifications": ["cert1", "cert2"],
+  "education": ["degree1", "degree2"],
+  "estimatedYearsOfExperience": 3
 }`;
 
-    const response = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
+    const chatCompletion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
       messages: [
         {
           role: 'system',
-          content: 'You are a CV parser that extracts structured information from resumes. Always return valid JSON.'
+          content: 'You are an expert ATS (Applicant Tracking System) parser. Return ONLY valid JSON with no markdown.'
         },
-        {
-          role: 'user',
-          content: prompt
-        }
+        { role: 'user', content: prompt }
       ],
-      temperature: 0.3,
-      max_tokens: 500
+      temperature: 0.1,
+      max_tokens: 3000
     });
 
-    const content = response.data.choices[0].message.content;
-    const parsed = JSON.parse(content);
+    const raw = chatCompletion.choices[0].message.content.trim();
+    
+    // Extract JSON using regex in case the model prepends/appends markdown or text
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("No JSON object found in the response.");
+    }
+    const parsed = JSON.parse(jsonMatch[0]);
 
-    console.log('✅ CV parsed successfully with AI');
+    console.log('✅ CV parsed successfully with Groq AI');
     return {
       skills: parsed.skills || [],
       certifications: parsed.certifications || [],
@@ -129,7 +131,7 @@ Return a JSON object with this structure:
     };
 
   } catch (error) {
-    console.error('❌ AI CV parsing failed:', error.message);
+    console.error('❌ Groq CV parsing failed:', error.message);
     
     // Fallback: basic keyword extraction
     return fallbackParsing(cvText);

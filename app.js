@@ -273,10 +273,10 @@ async function loadJobForCandidate() {
     // Update page header
     document.getElementById('cJobTitle').textContent = job.title;
     
-    // Show Hausa toggle for demo jobs
-    if (job.title.toLowerCase().includes('demo') || job.title.toLowerCase().includes('customer support')) {
+    // Show Hausa toggle if enabled for this job
+    if (job.hausaEnabled) {
       document.getElementById('candidateHausaToggle').style.display = 'flex';
-      // Store original English job data for resetting
+      // Store original English job data for resetting/translation
       window._demoOriginalJob = job;
     } else {
       document.getElementById('candidateHausaToggle').style.display = 'none';
@@ -561,6 +561,7 @@ function nextCreateStep(from) {
     showProcessing('Publishing your job posting…', 'Distributing to selected communities and platforms');
     
     const textToArray = (str) => (str || '').split('\n').map(s => s.trim()).filter(s => s.length > 0);
+    const hausaEnabled = document.getElementById('hausaJobToggle')?.checked || false;
     
     const jobData = {
       title: document.getElementById('jobTitle').value.trim(),
@@ -573,10 +574,36 @@ function nextCreateStep(from) {
       qualifications: textToArray(document.getElementById('jobQuals').value),
       perks: textToArray(document.getElementById('jobPerks').value),
       niceToHave: textToArray(document.getElementById('jobNiceToHave').value),
-      selectedChannels: selectedCommunities.map(i => COMMUNITIES[i].name)
+      selectedChannels: selectedCommunities.map(i => COMMUNITIES[i].name),
+      hausaEnabled: hausaEnabled
+    };
+
+    // If Hausa is enabled, fetch translation from Groq first
+    const publishJob = async () => {
+      if (hausaEnabled) {
+        try {
+          showProcessing('Translating to Hausa with AI…', 'Groq LLaMA 3 is generating the Hausa translation');
+          const transResp = await fetch('/api/jobs/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(jobData)
+          });
+          const transData = await transResp.json();
+          if (transData.success && transData.translation) {
+            jobData.hausaTranslation = transData.translation;
+            showToast('✅ Hausa translation complete!', 'success', '🇳🇬');
+          }
+        } catch (e) {
+          console.error('Translation failed, continuing without it:', e);
+          showToast('Translation failed, publishing in English only', 'warning', '⚠️');
+        }
+        showProcessing('Publishing your job posting…', 'Distributing to selected communities and platforms');
+      }
+
+      return createJob(jobData);
     };
     
-    createJob(jobData)
+    publishJob()
       .then(result => {
         hideProcessing();
         
@@ -1676,8 +1703,10 @@ function copyLink() {
 
 // Pretty Printer for Job Postings
 function formatJobPosting(job) {
-  const skills = job.skills.map(s => `• ${s}`).join('\n');
-  
+  const formatList = (arr) => Array.isArray(arr) && arr.length > 0 
+    ? arr.map(i => `• ${i}`).join('\n') 
+    : 'None specified';
+
   const formatted = `
 ═══════════════════════════════════════════
 ${job.title.toUpperCase()}
@@ -1690,11 +1719,17 @@ ${job.title.toUpperCase()}
 ABOUT THE ROLE
 ${wrapText(job.description, 80)}
 
-REQUIRED SKILLS
-${skills}
+KEY RESPONSIBILITIES
+${formatList(job.responsibilities)}
 
-KEY QUALIFICATIONS
-${wrapText(job.qualifications || 'Please see job description', 80)}
+REQUIRED SKILLS
+${formatList(job.skills)}
+
+QUALIFICATIONS
+${formatList(job.qualifications)}
+
+PERKS & BENEFITS
+${formatList(job.perks)}
 
 ───────────────────────────────────────────
 How to Apply:
@@ -1952,37 +1987,39 @@ function previewCandidatePage() {
     showToast('No job selected', 'danger', '❌');
     return;
   }
-  
-  // Generate the application URL with jobId
   const baseUrl = window.location.origin + window.location.pathname;
   const applicationUrl = `${baseUrl}?jobId=${jobId}`;
-  
-  // Open in new tab
   window.open(applicationUrl, '_blank');
   showToast('Opening candidate application page', 'gold', '👁️');
 }
 
 // ============================================
-// HAUSA DEMO TRANSLATION LOGIC
+// HAUSA AI TRANSLATION LOGIC
 // ============================================
 function toggleHausaLanguage(isHausa) {
   if (isHausa) {
-    // Translate Job Description (Demo)
+    // Use real AI translation if available, fall back to original job text
     const jobDescSidebar = document.getElementById('jobDescriptionSidebar');
     if (jobDescSidebar && window._demoOriginalJob) {
-      const demoJob = { ...window._demoOriginalJob };
-      demoJob.title = "Wakili na Tallafin Abokan Ciniki"; // Customer Support Rep
-      demoJob.description = "Muna neman Wakili na Tallafin Abokan Ciniki wanda zai taimaka wa abokan cinikinmu. Zaku rika amsa tambayoyi, warware matsaloli, kuma tabbatar da kowa yana farin ciki da sabis dinmu.";
-      demoJob.responsibilities = [
-        "Amsa kiran waya da sakonnin abokan ciniki da wuri",
-        "Taimakawa wajen warware matsalolin asusu",
-        "Bayar da rahoto akan matsalolin da aka saba fuskanta"
-      ];
-      demoJob.skills = ["Sadarwa", "Harkokin Kasuwanci", "Kwamfuta"];
-      demoJob.qualifications = ["An fi son masu digiri ko difloma", "Kwarewa wajen magana da Hausa da Turanci"];
-      demoJob.perks = ["Albashi mai tsoka", "Damar yin aiki daga gida"];
-      demoJob.niceToHave = ["Kwarewa a harkar tallace-tallace"];
-      jobDescSidebar.innerHTML = formatJobDescriptionHTML(demoJob);
+      const translation = window._demoOriginalJob.hausaTranslation;
+      if (translation) {
+        // Real Groq translation — build a translated job object
+        const hausaJob = {
+          ...window._demoOriginalJob,
+          title: translation.title || window._demoOriginalJob.title,
+          description: translation.description || window._demoOriginalJob.description,
+          responsibilities: translation.responsibilities || window._demoOriginalJob.responsibilities,
+          qualifications: translation.qualifications || window._demoOriginalJob.qualifications,
+          skills: window._demoOriginalJob.skills, // keep original skill tags
+          perks: translation.perks || window._demoOriginalJob.perks,
+          niceToHave: translation.niceToHave || window._demoOriginalJob.niceToHave
+        };
+        jobDescSidebar.innerHTML = formatJobDescriptionHTML(hausaJob);
+        document.getElementById('cJobTitle').textContent = translation.title || window._demoOriginalJob.title;
+      } else {
+        // No translation saved — show a friendly message
+        jobDescSidebar.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-mid);"><p>⚠️ No Hausa translation available for this job.</p><p style="font-size:12px; margin-top:8px;">Enable "Hausa Translation" when creating the job to activate this feature.</p></div>';
+      }
     }
 
     // Translate Form Labels
@@ -1997,7 +2034,7 @@ function toggleHausaLanguage(isHausa) {
     document.getElementById('lblCurrentRole').innerHTML = 'Aikin da Kake Yi Yanzu';
     document.getElementById('lblKeySkills').innerHTML = 'Kwarewa (Skills) <span class="required">*</span>';
     document.getElementById('lblAchievements').innerHTML = 'Cikakken Bayanin Aiki / Nasarori <span class="required">*</span>';
-    document.getElementById('lblAchievementTip').innerHTML = '💡 Shawara: Rubuta abubuwan da ka cimma a baya.';
+    document.getElementById('lblAchievementTip').innerHTML = '💡 Shawara: Rubuta abubuwan da ka cimma a baya tare da alkaluma.';
     document.getElementById('lblRelevantQuals').innerHTML = 'Takardun Shaida';
 
     document.getElementById('lblCVCover').innerHTML = 'Takardar CV da Wasiƙar Neman Aiki';
@@ -2011,20 +2048,21 @@ function toggleHausaLanguage(isHausa) {
 
     // Translate Tips
     document.getElementById('lblTipsTitle').innerHTML = '✨ Hanyoyin Yin Fice';
-    document.getElementById('lblTip1').innerHTML = '<strong>Yi amfani da alkaluma</strong><br/>Bayyana nasarorinka tare da lamba.';
-    document.getElementById('lblTip2').innerHTML = '<strong>Daidaita bayaninka</strong><br/>Rubuta kalmomin da suka dace da aikin da kake nema.';
-    document.getElementById('lblTip3').innerHTML = '<strong>Rubuta kwarewarka duka</strong><br/>Kada ka bar wata kwarewa a baya ko da tana da sauki.';
-    document.getElementById('lblTip4').innerHTML = '<strong>Bayyana takardunka dalla-dalla</strong><br/>Wannan zai taimaka wajen samun maki mai yawa.';
+    document.getElementById('lblTip1').innerHTML = '<strong>Yi amfani da alkaluma</strong><br/>Bayyana nasarorinka tare da lamba. "Karin saya kashi 40%" ya fi "inganta aikin sayarwa."';
+    document.getElementById('lblTip2').innerHTML = '<strong>Daidaita bayaninka</strong><br/>Rubuta kalmomin da suka dace da aikin da kake nema domin AI ta fahimce ka sosai.';
+    document.getElementById('lblTip3').innerHTML = '<strong>Rubuta kwarewarka duka</strong><br/>Kada ka bar wata kwarewa a baya ko da tana da sauki a gare ka.';
+    document.getElementById('lblTip4').innerHTML = '<strong>Bayyana takardunka dalla-dalla</strong><br/>Makin ka zai karu idan ka ambaci digirinka da takardar shaida daki-daki.';
 
-    // Checkbox styling update (Green for Hausa)
-    document.getElementById('hausaCandToggleBg').style.backgroundColor = '#00a650'; // Green for Nigeria
+    // Toggle styling (Nigeria Green)
+    document.getElementById('hausaCandToggleBg').style.backgroundColor = '#00a650';
     document.getElementById('hausaCandToggleDot').style.transform = 'translateX(16px)';
     
   } else {
-    // Revert Job Description
+    // Revert Job Description to English
     const jobDescSidebar = document.getElementById('jobDescriptionSidebar');
     if (jobDescSidebar && window._demoOriginalJob) {
       jobDescSidebar.innerHTML = formatJobDescriptionHTML(window._demoOriginalJob);
+      document.getElementById('cJobTitle').textContent = window._demoOriginalJob.title;
     }
 
     // Revert Form Labels
@@ -2053,7 +2091,7 @@ function toggleHausaLanguage(isHausa) {
 
     // Revert Tips
     document.getElementById('lblTipsTitle').innerHTML = '✨ Stand Out Tips';
-    document.getElementById('lblTip1').innerHTML = '<strong>Use numbers & metrics</strong><br />Quantify your achievements. "Reduced load time by 40%" beats "improved performance".';
+    document.getElementById('lblTip1').innerHTML = '<strong>Use numbers & metrics</strong><br />Quantify your achievements. "Reduced load time by 40%" beats "improved performance."';
     document.getElementById('lblTip2').innerHTML = '<strong>Tailor your summary</strong><br />Mirror keywords from the job description naturally in your achievements section.';
     document.getElementById('lblTip3').innerHTML = '<strong>List all relevant skills</strong><br />Include tools, languages, and platforms even if you think they\'re obvious.';
     document.getElementById('lblTip4').innerHTML = '<strong>Clear qualifications</strong><br />State degrees, certifications, and relevant training explicitly as they affect your match score.';
@@ -2063,3 +2101,4 @@ function toggleHausaLanguage(isHausa) {
     document.getElementById('hausaCandToggleDot').style.transform = 'translateX(0)';
   }
 }
+

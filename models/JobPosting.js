@@ -24,6 +24,9 @@ class JobPosting {
     this.applicantCount = data.applicantCount || 0;
     this.shortlistedCount = data.shortlistedCount || 0;
     this.status = data.status || 'active';
+    // Hausa AI Translation
+    this.hausaEnabled = data.hausaEnabled || false;
+    this.hausaTranslation = data.hausaTranslation || null;
   }
 
   /**
@@ -46,7 +49,9 @@ class JobPosting {
       createdAt: this.createdAt,
       applicantCount: this.applicantCount,
       shortlistedCount: this.shortlistedCount,
-      status: this.status
+      status: this.status,
+      hausaEnabled: this.hausaEnabled,
+      hausaTranslation: this.hausaTranslation
     };
   }
 
@@ -77,6 +82,7 @@ class CandidateApplication {
     this.currentRole = data.currentRole || null;
     this.skills = data.skills || [];
     this.achievements = data.achievements || '';
+    this.qualifications = data.qualifications || null;
     
     // Files
     this.cvUrl = data.cvUrl || null;
@@ -120,7 +126,8 @@ class CandidateApplication {
       status: this.status,
       statusHistory: this.statusHistory,
       source: this.source,
-      appliedAt: this.appliedAt
+      appliedAt: this.appliedAt,
+      qualifications: this.qualifications
     };
   }
 

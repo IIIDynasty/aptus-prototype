@@ -44,17 +44,11 @@
       <!-- Left Profile Card -->
       <div class="profile-card profile-left">
         <div class="profile-image-placeholder">
-          <!-- Placeholder for professional photo -->
-          <div class="image-placeholder-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
+          <img src="images/2.jpg" alt="Professional Receptionist Candidate"
+            style="width: 100%; height: 100%; object-fit: cover;" />
         </div>
         <div class="profile-badge">
-          <span class="badge-text">Receptionist</span>
+          <span class="badge-text">Doctor</span>
         </div>
       </div>
 
@@ -123,14 +117,8 @@
       <!-- Right Profile Card -->
       <div class="profile-card profile-right">
         <div class="profile-image-placeholder">
-          <!-- Placeholder for professional photo -->
-          <div class="image-placeholder-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
+          <img src="images/1-avatar.jpg" alt="Professional Sales Representative Candidate"
+            style="width: 100%; height: 100%; object-fit: cover;" />
         </div>
         <div class="profile-badge">
           <span class="badge-text">Sales Representative</span>
@@ -289,17 +277,23 @@
               </div>
               <div class="card-body">
                 <!-- Hausa Toggle Demo (Moved to top for visibility) -->
-                <div class="form-group" style="margin-bottom:20px; padding:12px; background:var(--bg-light); border-radius:var(--radius); border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+                <div class="form-group"
+                  style="margin-bottom:20px; padding:12px; background:var(--bg-light); border-radius:var(--radius); border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
                   <div>
-                    <label class="form-label" style="margin-bottom:2px;">Enable Hausa Translation (Powered by AI) <span class="badge badge-gold" style="font-size:10px; margin-left:6px;">BETA</span></label>
-                    <div class="form-hint" style="font-size:11px;">Automatically translate your job posting and application form to Hausa to reach a wider Northern Nigerian audience.</div>
+                    <label class="form-label" style="margin-bottom:2px;">Enable Hausa Translation (Powered by AI) <span
+                        class="badge badge-gold" style="font-size:10px; margin-left:6px;">BETA</span></label>
+                    <div class="form-hint" style="font-size:11px;">Automatically translate your job posting and
+                      application form to Hausa to reach a wider Northern Nigerian audience.</div>
                   </div>
                   <label style="position:relative; display:inline-block; width:44px; height:24px;">
                     <input type="checkbox" style="opacity:0; width:0; height:0;" id="hausaJobToggle">
-                    <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.4s; border-radius:34px;"
-                      onmouseover="this.style.backgroundColor='#bbb'" onmouseout="this.style.backgroundColor=document.getElementById('hausaJobToggle').checked ? 'var(--primary-blue)' : '#ccc'"
+                    <span
+                      style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.4s; border-radius:34px;"
+                      onmouseover="this.style.backgroundColor='#bbb'"
+                      onmouseout="this.style.backgroundColor=document.getElementById('hausaJobToggle').checked ? 'var(--primary-blue)' : '#ccc'"
                       onclick="const cb=document.getElementById('hausaJobToggle'); cb.checked=!cb.checked; this.style.backgroundColor=cb.checked ? 'var(--primary-blue)' : '#ccc'; this.children[0].style.transform=cb.checked ? 'translateX(20px)' : 'translateX(0)'; return false;">
-                      <span style="position:absolute; content:''; height:18px; width:18px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%;"></span>
+                      <span
+                        style="position:absolute; content:''; height:18px; width:18px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%;"></span>
                     </span>
                   </label>
                 </div>
@@ -343,7 +337,9 @@
                     style="min-height:90px;"></textarea>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Key Responsibilities <span style="font-size:11px;font-weight:400;color:var(--text-mid);">(paste text here)</span> <span class="required">*</span></label>
+                  <label class="form-label">Key Responsibilities <span
+                      style="font-size:11px;font-weight:400;color:var(--text-mid);">(paste text here)</span> <span
+                      class="required">*</span></label>
                   <textarea class="form-textarea" id="jobResp"
                     placeholder="Paste a list of responsibilities. E.g.:&#10;Develop responsive web applications&#10;Build reusable UI components"
                     style="min-height:90px;"></textarea>
@@ -358,19 +354,24 @@
                   <div class="skill-tags" id="skillTags"></div>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Minimum Requirements <span style="font-size:11px;font-weight:400;color:var(--text-mid);">(paste text here)</span></label>
+                  <label class="form-label">Minimum Requirements <span
+                      style="font-size:11px;font-weight:400;color:var(--text-mid);">(paste text here)</span></label>
                   <textarea class="form-textarea" id="jobQuals"
                     placeholder="Paste minimum requirements. E.g.:&#10;BSc Computer Science or equivalent&#10;3+ years of React experience"
                     style="min-height:90px;"></textarea>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Nice to Have <span style="font-size:11px;font-weight:400;color:var(--text-mid);">(paste text here, Optional)</span></label>
+                  <label class="form-label">Nice to Have <span
+                      style="font-size:11px;font-weight:400;color:var(--text-mid);">(paste text here,
+                      Optional)</span></label>
                   <textarea class="form-textarea" id="jobNiceToHave"
                     placeholder="Paste bonus qualifications. E.g.:&#10;Experience with Azure&#10;Master's Degree"
                     style="min-height:70px;"></textarea>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Perks & Benefits <span style="font-size:11px;font-weight:400;color:var(--text-mid);">(paste text here, Optional)</span></label>
+                  <label class="form-label">Perks & Benefits <span
+                      style="font-size:11px;font-weight:400;color:var(--text-mid);">(paste text here,
+                      Optional)</span></label>
                   <textarea class="form-textarea" id="jobPerks"
                     placeholder="Paste perks. E.g.:&#10;Competitive Salary&#10;Remote work options"
                     style="min-height:70px;"></textarea>
@@ -529,10 +530,12 @@
               <button class="btn btn-outline btn-sm" onclick="manualRefreshRankings()">
                 🔄 Refresh
               </button>
-              <button class="btn btn-success btn-sm" onclick="handleBulkAction('interview')" title="Send interview invites to selected candidates">
+              <button class="btn btn-success btn-sm" onclick="handleBulkAction('interview')"
+                title="Send interview invites to selected candidates">
                 ✉️ Invite Selected
               </button>
-              <button class="btn btn-danger btn-sm" onclick="handleBulkAction('reject')" title="Send rejection emails to selected candidates">
+              <button class="btn btn-danger btn-sm" onclick="handleBulkAction('reject')"
+                title="Send rejection emails to selected candidates">
                 ✕ Reject Selected
               </button>
             </div>
@@ -553,8 +556,7 @@
                       <th style="width:40px; text-align:center;">
                         <input type="checkbox" id="selectAllCandidates" title="Select All"
                           style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary-blue);"
-                          onchange="document.querySelectorAll('.candidate-checkbox').forEach(cb => cb.checked = this.checked)"
-                        />
+                          onchange="document.querySelectorAll('.candidate-checkbox').forEach(cb => cb.checked = this.checked)" />
                       </th>
                       <th style="width:46px;">#</th>
                       <th>Candidate</th>
@@ -675,15 +677,20 @@
               <p>Lagos, Nigeria (Hybrid) · Mid–Senior Level · <span class="badge badge-gold"
                   style="font-size:11px;">Engineering</span></p>
             </div>
-            
+
             <!-- Hausa Toggle (Hidden by default, shown for demo job) -->
-            <div id="candidateHausaToggle" style="display:none; align-items:center; gap:8px; background:var(--bg-light); padding:6px 12px; border-radius:20px; border:1px solid var(--border);">
+            <div id="candidateHausaToggle"
+              style="display:none; align-items:center; gap:8px; background:var(--bg-light); padding:6px 12px; border-radius:20px; border:1px solid var(--border);">
               <span style="font-size:13px; font-weight:600; color:var(--text-dark);">🇬🇧 English</span>
               <label style="position:relative; display:inline-block; width:36px; height:20px;">
-                <input type="checkbox" style="opacity:0; width:0; height:0;" id="hausaCandToggle" onchange="toggleHausaLanguage(this.checked)">
-                <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.4s; border-radius:34px;"
+                <input type="checkbox" style="opacity:0; width:0; height:0;" id="hausaCandToggle"
+                  onchange="toggleHausaLanguage(this.checked)">
+                <span
+                  style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.4s; border-radius:34px;"
                   id="hausaCandToggleBg">
-                  <span style="position:absolute; content:''; height:14px; width:14px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%;" id="hausaCandToggleDot"></span>
+                  <span
+                    style="position:absolute; content:''; height:14px; width:14px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%;"
+                    id="hausaCandToggleDot"></span>
                 </span>
               </label>
               <span style="font-size:13px; font-weight:600; color:var(--text-dark);">🇳🇬 Hausa</span>
@@ -694,7 +701,8 @@
               <div class="app-split">
                 <div>
                   <div class="card" style="margin-bottom:20px;">
-                    <div class="card-header"><span class="card-title" id="lblPersonalInfo">Personal Information</span></div>
+                    <div class="card-header"><span class="card-title" id="lblPersonalInfo">Personal Information</span>
+                    </div>
                     <div class="card-body">
                       <div class="form-grid">
                         <div class="form-group">
@@ -723,11 +731,13 @@
 
                   <!-- Experience Section — renamed -->
                   <div class="card" style="margin-bottom:20px;">
-                    <div class="card-header"><span class="card-title" id="lblExperience">Let's Hear What Makes You Stand Out</span></div>
+                    <div class="card-header"><span class="card-title" id="lblExperience">Let's Hear What Makes You Stand
+                        Out</span></div>
                     <div class="card-body">
                       <div class="form-grid">
                         <div class="form-group">
-                          <label class="form-label" id="lblYearsExp">Years of Experience <span class="required">*</span></label>
+                          <label class="form-label" id="lblYearsExp">Years of Experience <span
+                              class="required">*</span></label>
                           <select class="form-select" id="candYears">
                             <option value="">Select…</option>
                             <option value="0">Less than 1 year</option>
@@ -758,7 +768,8 @@
                           <input class="form-input" id="candSkillInput" type="text"
                             placeholder="Type a skill and press Enter or click Add…" style="flex:1;"
                             onkeydown="if(event.key==='Enter'){event.preventDefault();addCandidateSkill();}" />
-                          <button class="btn btn-outline btn-sm" id="btnSkillAdd" onclick="addCandidateSkill()">Add</button>
+                          <button class="btn btn-outline btn-sm" id="btnSkillAdd"
+                            onclick="addCandidateSkill()">Add</button>
                         </div>
                         <div class="skill-tags" id="candSkillTags"></div>
                       </div>
@@ -766,8 +777,8 @@
                       <!-- Measurable Achievements — renamed from Professional Summary -->
                       <div class="form-group">
                         <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
-                          <label class="form-label" id="lblAchievements" style="margin-bottom:0;">Measurable Achievements <span
-                              class="required">*</span></label>
+                          <label class="form-label" id="lblAchievements" style="margin-bottom:0;">Measurable
+                            Achievements <span class="required">*</span></label>
                           <button class="info-icon-btn" onclick="openAchievementsInfoPopup()"
                             title="How to write measurable achievements">
                             <span>!</span>
@@ -775,7 +786,8 @@
                         </div>
                         <textarea class="form-textarea" id="candSummary" style="min-height:160px;"
                           placeholder="Use numbers, percentages and outcomes. For example:&#10;1. Increased sales revenue by 34% in Q2 2024 by introducing a consultative approach with 18 enterprise clients.&#10;2. Reduced system downtime by 62% by migrating legacy infrastructure to AWS, saving the company ₦4.2M annually.&#10;3. Led a cross-functional team of 8 to deliver a product in 3 months — 2 weeks ahead of schedule."></textarea>
-                        <div class="form-hint" id="lblAchievementTip">💡 Tip: Recruiters and AI systems respond better to specific, measurable
+                        <div class="form-hint" id="lblAchievementTip">💡 Tip: Recruiters and AI systems respond better
+                          to specific, measurable
                           claims.</div>
                       </div>
 
@@ -848,14 +860,14 @@
                     </div>
                   </div>
 
-                    <div style="display:flex;justify-content:flex-end;gap:12px;align-items:center;">
-                      <button class="btn btn-outline" style="padding:14px 28px;font-size:14px;"
-                        onclick="previewMatchScore()" id="btnPreviewScore">
-                        🔍 Preview AI Match Score
-                      </button>
-                      <button class="btn btn-gold" style="padding:14px 32px;font-size:15px;"
-                        onclick="submitApplication()" id="btnSubmitApp">
-                        Submit Application
+                  <div style="display:flex;justify-content:flex-end;gap:12px;align-items:center;">
+                    <button class="btn btn-outline" style="padding:14px 28px;font-size:14px;"
+                      onclick="previewMatchScore()" id="btnPreviewScore">
+                      🔍 Preview AI Match Score
+                    </button>
+                    <button class="btn btn-gold" style="padding:14px 32px;font-size:15px;" onclick="submitApplication()"
+                      id="btnSubmitApp">
+                      Submit Application
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 2L11 13" />
@@ -876,22 +888,26 @@
                   <div class="tips-side-title" id="lblTipsTitle">✨ Stand Out Tips</div>
                   <div class="tip-side-item">
                     <div class="tip-side-icon">📊</div>
-                    <div class="tip-side-text" id="lblTip1"><strong>Use numbers & metrics</strong><br />Quantify your achievements.
+                    <div class="tip-side-text" id="lblTip1"><strong>Use numbers & metrics</strong><br />Quantify your
+                      achievements.
                       "Reduced load time by 40%" beats "improved performance".</div>
                   </div>
                   <div class="tip-side-item">
                     <div class="tip-side-icon">🎯</div>
-                    <div class="tip-side-text" id="lblTip2"><strong>Tailor your summary</strong><br />Mirror keywords from the job
+                    <div class="tip-side-text" id="lblTip2"><strong>Tailor your summary</strong><br />Mirror keywords
+                      from the job
                       description naturally in your achievements section.</div>
                   </div>
                   <div class="tip-side-item">
                     <div class="tip-side-icon">🔑</div>
-                    <div class="tip-side-text" id="lblTip3"><strong>List all relevant skills</strong><br />Include tools, languages,
+                    <div class="tip-side-text" id="lblTip3"><strong>List all relevant skills</strong><br />Include
+                      tools, languages,
                       and platforms even if you think they're obvious.</div>
                   </div>
                   <div class="tip-side-item">
                     <div class="tip-side-icon">📋</div>
-                    <div class="tip-side-text" id="lblTip4"><strong>Clear qualifications</strong><br />State degrees, certifications,
+                    <div class="tip-side-text" id="lblTip4"><strong>Clear qualifications</strong><br />State degrees,
+                      certifications,
                       and relevant training explicitly as they affect your match score.</div>
                   </div>
                   <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);">
