@@ -197,16 +197,25 @@ async function recruiterNav(view) {
     if (el) el.classList.add('hidden');
     const sb = document.getElementById(`sb-${v}`);
     if (sb) sb.classList.remove('active');
+    // Also update mobile tab bar
+    const mob = document.getElementById(`mob-sb-${v}`);
+    if (mob) mob.classList.remove('active');
   });
 
   const el = document.getElementById(`view-${view}`);
   if (el) {
     el.classList.remove('hidden');
     el.classList.add('animate-in');
+    // Scroll to top on mobile navigation
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   const sb = document.getElementById(`sb-${view}`);
   if (sb) sb.classList.add('active');
+
+  // Sync mobile tab bar active state
+  const mob = document.getElementById(`mob-sb-${view}`);
+  if (mob) mob.classList.add('active');
 
   currentRecruiterView = view;
 
@@ -233,16 +242,24 @@ async function candidateNav(view) {
     if (el) el.classList.add('hidden');
     const sb = document.getElementById(`csb-${v}`);
     if (sb) sb.classList.remove('active');
+    // Also update mobile tab bar
+    const mob = document.getElementById(`mob-csb-${v}`);
+    if (mob) mob.classList.remove('active');
   });
 
   const el = document.getElementById(`cview-${view}`);
   if (el) {
     el.classList.remove('hidden');
     el.classList.add('animate-in');
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   const sb = document.getElementById(`csb-${view}`);
   if (sb) sb.classList.add('active');
+
+  // Sync mobile tab bar active state
+  const mob = document.getElementById(`mob-csb-${view}`);
+  if (mob) mob.classList.add('active');
 
   currentCandidateView = view;
 
@@ -412,27 +429,31 @@ function renderDashboardWithJobs(jobs) {
     
     return `
       <div class="job-item" onclick="viewJobRankings('${job.id}')">
-        <div class="job-item-info">
-          <h4>${job.title}</h4>
-          <div class="job-item-meta">
-            <span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              ${job.location}
-            </span>
-            <span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
-              ${job.department}
-            </span>
-            <span>${job.experienceLevel}</span>
+        <div class="job-item-main">
+          <div class="job-item-info">
+            <h4>${job.title}</h4>
+            <div class="job-item-meta">
+              <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                ${job.location}
+              </span>
+              <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                ${job.department}
+              </span>
+              <span>${job.experienceLevel}</span>
+            </div>
+            <div class="job-item-badges">
+              <span class="badge badge-gray">${applicants} Applicants</span>
+              <span class="badge badge-success">${shortlisted} Shortlisted</span>
+              <span class="badge badge-gold">Active</span>
+            </div>
           </div>
         </div>
         <div class="job-item-actions">
-          <span class="badge badge-gray">${applicants} Applicants</span>
-          <span class="badge badge-success">${shortlisted} Shortlisted</span>
-          <span class="badge badge-gold">Active</span>
-          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); copyJobLink('${job.id}')">📋 Copy Link</button>
-          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); viewJobRankings('${job.id}')">View Rankings →</button>
-          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteJob('${job.id}', '${job.title.replace(/'/g, "\\'")}')">🗑️ Delete</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); copyJobLink('${job.id}')" title="Copy application link">📋 Copy Link</button>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); viewJobRankings('${job.id}')" title="View ranked candidates">View Rankings →</button>
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteJob('${job.id}', '${job.title.replace(/'/g, "\\'")}')">🗑️</button>
         </div>
       </div>
     `;

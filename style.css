@@ -1044,11 +1044,19 @@ body {
   justify-content: space-between;
   transition: var(--transition);
   cursor: pointer;
+  gap: 16px;
 }
 
 .job-item:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--primary-blue);
+}
+
+.job-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
 }
 
 .job-item-info h4 {
@@ -1060,8 +1068,9 @@ body {
 
 .job-item-meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: 12px 16px;
   font-size: 12px;
   color: var(--text-mid);
 }
@@ -1070,6 +1079,7 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
 .job-item-meta svg {
@@ -1077,10 +1087,17 @@ body {
   height: 13px;
 }
 
+.job-item-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .job-item-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 /* ============================================
@@ -2478,8 +2495,25 @@ body {
 }
 
 /* ============================================
+   RANKINGS HEADER
+   ============================================ */
+.rankings-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rankings-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ============================================
    RESPONSIVE UPDATES
    ============================================ */
+
+/* ── TABLET (max 900px) ── */
 @media (max-width: 900px) {
   .landing-benefits {
     grid-template-columns: 1fr;
@@ -2505,7 +2539,6 @@ body {
 
   .nav-links {
     display: none;
-    /* Hide on mobile, could add hamburger menu */
   }
 
   .hero-container {
@@ -2516,7 +2549,6 @@ body {
 
   .profile-card {
     display: none;
-    /* Hide profile cards on mobile */
   }
 
   .hero-title {
@@ -2546,8 +2578,42 @@ body {
   .floating-element {
     display: none;
   }
+
+  /* App layout: stack sidebar & content */
+  .nav {
+    padding: 14px 16px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .community-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .app-split {
+    grid-template-columns: 1fr;
+  }
+
+  .tips-side-panel {
+    position: static;
+  }
+
+  .resource-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .role-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
+/* ── TABLET mid (min 901px to 1200px) ── */
 @media (min-width: 901px) and (max-width: 1200px) {
   .hero-container {
     gap: 40px;
@@ -2565,5 +2631,263 @@ body {
 
   .hero-title {
     font-size: 56px;
+  }
+}
+
+/* ── MOBILE (max 640px) — Primary fixes ── */
+@media (max-width: 640px) {
+
+  /* --- Global --- */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* --- Landing page hero --- */
+  .hero-title {
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .hero-description {
+    font-size: 14px;
+  }
+
+  .stats-section {
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 16px;
+  }
+
+  .stat-number {
+    font-size: 28px;
+  }
+
+  .features-section {
+    padding: 40px 16px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .section-title {
+    font-size: 26px;
+  }
+
+  /* --- Top nav (app) --- */
+  .nav {
+    padding: 12px 14px;
+  }
+
+  .nav-logo-text-only {
+    font-size: 20px;
+  }
+
+  /* --- App Layout: convert sidebar to bottom tab bar --- */
+  .app-layout {
+    flex-direction: column;
+    min-height: calc(100vh - 60px);
+    padding-bottom: 70px; /* space for bottom tab bar */
+  }
+
+  .sidebar {
+    /* Hide the traditional left sidebar */
+    display: none !important;
+  }
+
+  /* Bottom navigation tab bar */
+  .mobile-tab-bar {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-top: 1.5px solid var(--border-light);
+    z-index: 200;
+    padding: 8px 0 env(safe-area-inset-bottom, 8px);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+
+  .tab-bar-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-mid);
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+
+  .tab-bar-btn svg {
+    width: 22px;
+    height: 22px;
+    opacity: 0.6;
+  }
+
+  .tab-bar-btn.active {
+    color: var(--primary-blue);
+  }
+
+  .tab-bar-btn.active svg {
+    opacity: 1;
+  }
+
+  /* --- Main content area --- */
+  .main-content {
+    padding: 16px 12px;
+    overflow-x: hidden;
+  }
+
+  /* --- Dashboard cards/stats --- */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px 12px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  /* --- Page headers --- */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .page-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* --- Job cards on dashboard --- */
+  .job-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .job-item-main {
+    width: 100%;
+  }
+
+  .job-item-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .job-item-actions .btn {
+    flex: 1;
+    min-width: 120px;
+    font-size: 12px;
+    padding: 8px 10px;
+    justify-content: center;
+  }
+
+  /* --- Rankings Header --- */
+  .rankings-header-controls {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .rankings-action-buttons {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .rankings-action-buttons .btn {
+    flex: 1;
+    min-width: 45%;
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  /* --- Post a Job form --- */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  /* --- Ranking table --- */
+  .ranking-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ranking-table th,
+  .ranking-table td {
+    font-size: 12px;
+    padding: 10px 8px;
+  }
+
+  /* Hide less important columns on mobile */
+  .ranking-table th:nth-child(3),
+  .ranking-table td:nth-child(3),
+  .ranking-table th:nth-child(4),
+  .ranking-table td:nth-child(4) {
+    display: none;
+  }
+
+  /* --- Modals --- */
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-end; /* slide up from bottom */
+  }
+
+  .modal-box {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 20px 20px 0 0;
+    margin: 0;
+  }
+
+  /* --- Candidate application form --- */
+  .app-split {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .candidate-form-col,
+  .tips-side-panel {
+    width: 100%;
+  }
+
+  /* --- Communities grid --- */
+  .community-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* --- Hausa translation toggle --- */
+  .lang-toggle-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }

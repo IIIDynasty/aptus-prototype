@@ -190,6 +190,26 @@
         </button>
       </aside>
 
+      <!-- Mobile Bottom Tab Bar (Recruiter) — hidden on desktop via CSS -->
+      <nav class="mobile-tab-bar" id="recruiterTabBar" style="display:none;">
+        <button class="tab-bar-btn active" id="mob-sb-dashboard" onclick="recruiterNav('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
+          Dashboard
+        </button>
+        <button class="tab-bar-btn" id="mob-sb-create" onclick="recruiterNav('create')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
+          Post Job
+        </button>
+        <button class="tab-bar-btn" id="mob-sb-rankings" onclick="recruiterNav('rankings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
+          Rankings
+        </button>
+        <button class="tab-bar-btn" id="mob-sb-communities" onclick="recruiterNav('communities')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></svg>
+          Reach
+        </button>
+      </nav>
+
       <!-- Main Content Area -->
       <main class="main-content">
 
@@ -522,22 +542,24 @@
                   id="rankingsAutoRefreshStatus" style="color:var(--success);font-size:12px;">🔄 Auto-refreshing</span>
               </p>
             </div>
-            <div class="flex gap-3">
-              <select class="form-select" id="rankingJobFilter" style="width:220px;padding:9px 12px;"
+            <div class="rankings-header-controls">
+              <select class="form-select" id="rankingJobFilter" style="min-width:180px;padding:9px 12px;"
                 onchange="filterRankingJob()">
                 <option value="">Loading jobs…</option>
               </select>
-              <button class="btn btn-outline btn-sm" onclick="manualRefreshRankings()">
-                🔄 Refresh
-              </button>
-              <button class="btn btn-success btn-sm" onclick="handleBulkAction('interview')"
-                title="Send interview invites to selected candidates">
-                ✉️ Invite Selected
-              </button>
-              <button class="btn btn-danger btn-sm" onclick="handleBulkAction('reject')"
-                title="Send rejection emails to selected candidates">
-                ✕ Reject Selected
-              </button>
+              <div class="rankings-action-buttons">
+                <button class="btn btn-outline btn-sm" onclick="manualRefreshRankings()">
+                  🔄 Refresh
+                </button>
+                <button class="btn btn-success btn-sm" onclick="handleBulkAction('interview')"
+                  title="Send interview invites to selected candidates">
+                  ✉️ Invite Selected
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="handleBulkAction('reject')"
+                  title="Send rejection emails to selected candidates">
+                  ✕ Reject Selected
+                </button>
+              </div>
             </div>
           </div>
           <div class="page-body">
@@ -666,6 +688,18 @@
           Resource Hub
         </button>
       </aside>
+
+      <!-- Mobile Bottom Tab Bar (Candidate) — hidden on desktop via CSS -->
+      <nav class="mobile-tab-bar" id="candidateTabBar" style="display:none;">
+        <button class="tab-bar-btn active" id="mob-csb-apply" onclick="candidateNav('apply')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+          Apply
+        </button>
+        <button class="tab-bar-btn" id="mob-csb-resources" onclick="candidateNav('resources')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" /></svg>
+          Resources
+        </button>
+      </nav>
 
       <main class="main-content">
 
