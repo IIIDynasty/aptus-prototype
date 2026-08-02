@@ -20,13 +20,12 @@
     <nav class="glass-nav">
       <div class="glass-nav-inner">
         <a href="#" onclick="goHome(); return false;" class="brand-logo">
-          Aptus.
+          <img src="images/Aptus_logo_transparent.png" alt="Aptus" class="nav-logo-img" />
         </a>
         <div class="nav-links">
-          <a href="#" class="nav-link">Home</a>
-          <a href="#" class="nav-link">About Us</a>
-          <a href="#" class="nav-link">Services</a>
-          <a href="#" class="nav-link">Pricing</a>
+          <a href="#" onclick="goHome(); window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="nav-link">Home</a>
+          <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#pricing" class="nav-link">Pricing</a>
         </div>
         <button class="nav-cta-btn" onclick="enterAs('recruiter')">Get Started</button>
       </div>
@@ -129,6 +128,315 @@
 
     </div>
   </section>
+
+  <!-- ============================================
+     LANDING SECTIONS (Below Hero)
+     ============================================ -->
+  <div id="landingSections">
+
+    <!-- ================================================
+         SECTION 1: THE PROBLEM — Fragmented Tools
+         ================================================ -->
+    <section class="lp-section lp-problem">
+      <div class="lp-container">
+        <h2 class="lp-section-title">Your recruiter's 8-hour day,<br/><span class="lp-accent">Wasted.</span></h2>
+        <p class="lp-section-sub">Every disconnected tool adds friction. Your recruiters spend more time navigating apps than actually hiring great people.</p>
+
+        <!-- Problem Illustration Image -->
+        <div class="problem-image-wrap">
+          <img src="images/Problem.png" alt="Your recruiter's 8-hour day, Wasted" class="problem-img" />
+        </div>
+
+        <!-- Stats Row -->
+        <div class="problem-stats">
+          <div class="problem-stat">
+            <div class="problem-stat-num">6+</div>
+            <div class="problem-stat-label">Apps juggled per hire</div>
+          </div>
+          <div class="problem-stat">
+            <div class="problem-stat-num">40%</div>
+            <div class="problem-stat-label">Of time lost to admin tasks</div>
+          </div>
+          <div class="problem-stat">
+            <div class="problem-stat-num">3.5 hrs</div>
+            <div class="problem-stat-label">Wasted every single day</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================
+         SECTION 2: THE SOLUTION — One Recruitment OS
+         ================================================ -->
+    <section class="lp-section lp-solution">
+      <div class="lp-container">
+        <h2 class="lp-section-title">Everything You Need to Hire,<br/><span class="lp-highlight-gradient">in One Place.</span></h2>
+        <p class="lp-section-sub">Aptus connects every tool you currently juggle into a single, intelligent Recruitment OS built for Northern Nigeria.</p>
+
+        <!-- Hub & Spoke Diagram -->
+        <div class="solution-hub-wrap">
+          <div class="solution-hub-diagram">
+            <!-- Spoke items -->
+            <div class="spoke-item spoke-tl">
+              <div class="spoke-card">
+                <div class="spoke-icon-wrap">
+                  <svg class="spoke-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <div class="spoke-name">Job Applications</div>
+              </div>
+            </div>
+            <div class="spoke-item spoke-tc">
+              <div class="spoke-card">
+                <div class="spoke-icon-wrap">
+                  <svg class="spoke-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                </div>
+                <div class="spoke-name">AI Scoring</div>
+              </div>
+            </div>
+            <div class="spoke-item spoke-tr">
+              <div class="spoke-card">
+                <div class="spoke-icon-wrap">
+                  <svg class="spoke-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="spoke-name">CV Viewer</div>
+              </div>
+            </div>
+            <div class="spoke-item spoke-mr">
+              <div class="spoke-card spoke-card-more">
+                <div class="spoke-icon-wrap">
+                  <svg class="spoke-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                </div>
+                <div class="spoke-name">More+</div>
+              </div>
+            </div>
+            <div class="spoke-item spoke-br">
+              <div class="spoke-card">
+                <div class="spoke-icon-wrap">
+                  <svg class="spoke-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="spoke-name">Community Reach</div>
+              </div>
+            </div>
+            <div class="spoke-item spoke-bc">
+              <div class="spoke-card">
+                <div class="spoke-icon-wrap">
+                  <svg class="spoke-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <div class="spoke-name">Local Language</div>
+              </div>
+            </div>
+            <div class="spoke-item spoke-bl">
+              <div class="spoke-card">
+                <div class="spoke-icon-wrap">
+                  <svg class="spoke-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div class="spoke-name">Team Notes</div>
+              </div>
+            </div>
+            <!-- Center Hub -->
+            <div class="hub-center">
+              <div class="hub-center-inner">
+                <img src="images/Aptus_logo_transparent.png" alt="Aptus Logo" class="hub-logo-img" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="solution-cta-sub">Stop switching apps. Start making better hires.</p>
+        <button class="lp-btn-primary" onclick="enterAs('recruiter')">Start Hiring Smarter →</button>
+      </div>
+    </section>
+
+    <!-- ================================================
+         SECTION 3: HOW IT WORKS — 3 Steps
+         ================================================ -->
+    <section id="how-it-works" class="lp-section lp-howitworks">
+      <div class="lp-container">
+        <h2 class="lp-section-title">How it work</h2>
+        <p class="lp-section-sub">Three things Aptus does that no other platform in Northern Nigeria does.</p>
+
+        <div class="hiw-steps">
+
+          <!-- Step 1 -->
+          <div class="hiw-step">
+            <div class="hiw-step-num">01</div>
+            <div class="hiw-step-card">
+              <div class="hiw-step-icon">🗣️</div>
+              <h3 class="hiw-step-title">Accept Applications<br/>in Local Language</h3>
+              <p class="hiw-step-desc">Candidates apply in Hausa or English — so they express themselves fully, not just what they can translate. You get clearer, more honest applications.</p>
+              <div class="hiw-step-tag">First in Northern Nigeria</div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="hiw-step">
+            <div class="hiw-step-num">02</div>
+            <div class="hiw-step-card hiw-step-card-featured">
+              <div class="hiw-step-icon">🖥️</div>
+              <h3 class="hiw-step-title">Review Everything<br/>in One Workspace</h3>
+              <p class="hiw-step-desc">Track each application you viewed. Read CVs side-by-side without switching tabs. Leave team notes. AI scores candidates instantly so your best hires rise to the top.</p>
+              <div class="hiw-feature-pills">
+                <span class="hiw-pill">✓ Unread tracking</span>
+                <span class="hiw-pill">✓ CV side-by-side</span>
+                <span class="hiw-pill">✓ Team collaboration</span>
+                <span class="hiw-pill">✓ AI scoring</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="hiw-step">
+            <div class="hiw-step-num">03</div>
+            <div class="hiw-step-card">
+              <div class="hiw-step-icon">🌐</div>
+              <h3 class="hiw-step-title">Distribute to Active<br/>Talent Communities</h3>
+              <p class="hiw-step-desc">Your job gets distributed to 340,000+ professionals in partner communities across Northern Nigeria — for free. Reach candidates who are already looking.</p>
+              <div class="hiw-step-tag">340K+ Professionals</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================
+         SECTION 4: PRICING
+         ================================================ -->
+    <section id="pricing" class="lp-section lp-pricing">
+      <div class="lp-container">
+        <h2 class="lp-section-title">Simple Pricing</h2>
+        <p class="lp-section-sub">Start free. Scale as you hire. Every plan built for Nigerian businesses.</p>
+
+        <div class="pricing-grid">
+
+          <!-- Free -->
+          <div class="pricing-card">
+            <div class="pricing-plan-name">Free</div>
+            <div class="pricing-price">₦0<span class="pricing-period">/mo</span></div>
+            <p class="pricing-desc">Everything you need to start screening better — at zero cost.</p>
+            <button class="pricing-btn pricing-btn-outline" onclick="enterAs('recruiter')">Get Started Free</button>
+            <ul class="pricing-features">
+              <li><span class="pf-check">✓</span> Unlimited job posts</li>
+              <li><span class="pf-check">✓</span> Unlimited applications</li>
+              <li><span class="pf-check">✓</span> 30 AI scoring credits</li>
+              <li><span class="pf-check">✓</span> Team collaboration (up to 3)</li>
+              <li><span class="pf-check">✓</span> Community job distribution</li>
+              <li><span class="pf-check">✓</span> Email shortlisted candidates</li>
+            </ul>
+          </div>
+
+          <!-- Professional (Featured) -->
+          <div class="pricing-card pricing-card-featured">
+            <div class="pricing-badge">⚡ Most Popular</div>
+            <div class="pricing-plan-name">Professional</div>
+            <div class="pricing-price">₦5,000<span class="pricing-period">/mo</span></div>
+            <p class="pricing-desc">For growing teams that need speed, structure, and AI-powered hiring.</p>
+            <button class="pricing-btn pricing-btn-primary" onclick="enterAs('recruiter')">Try Free for 14 Days</button>
+            <ul class="pricing-features">
+              <li><span class="pf-check">✓</span> Everything in Free</li>
+              <li><span class="pf-check">✓</span> 1,000 AI scoring credits</li>
+              <li><span class="pf-check">✓</span> Team collaboration (up to 5)</li>
+              <li><span class="pf-check">✓</span> Custom field analysis</li>
+              <li><span class="pf-check">✓</span> Email shortlisted & rejected</li>
+            </ul>
+          </div>
+
+          <!-- Enterprise -->
+          <div class="pricing-card">
+            <div class="pricing-plan-name">Enterprise</div>
+            <div class="pricing-price">₦10,000<span class="pricing-period">/mo</span></div>
+            <p class="pricing-desc">For organizations that need deep AI insights and full team access.</p>
+            <button class="pricing-btn pricing-btn-outline" onclick="enterAs('recruiter')">Contact Sales</button>
+            <ul class="pricing-features">
+              <li><span class="pf-check">✓</span> Everything in Professional</li>
+              <li><span class="pf-check">✓</span> 2,000 AI scoring credits</li>
+              <li><span class="pf-check">✓</span> Team collaboration (up to 10)</li>
+              <li><span class="pf-check">✓</span> Advanced AI scoring engine</li>
+              <li><span class="pf-check">✓</span> Priority support</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================
+         SECTION 5: SOCIAL PROOF BANNER
+         ================================================ -->
+    <section class="lp-section lp-proof">
+      <div class="lp-container">
+        <div class="lp-proof-inner">
+          <div class="lp-proof-quote">"</div>
+          <h2 class="lp-proof-text">Built from interviews<br/>with real recruiters.</h2>
+          <p class="lp-proof-sub">Every feature in Aptus exists because a recruiter in Northern Nigeria told us their pain. We didn't guess — we listened.</p>
+          <div class="lp-proof-stats">
+            <div class="lp-proof-stat"><strong>20+</strong><span>Recruiters interviewed</span></div>
+            <div class="lp-proof-stat-divider"></div>
+            <div class="lp-proof-stat"><strong>5</strong><span>Industries covered</span></div>
+            <div class="lp-proof-stat-divider"></div>
+            <div class="lp-proof-stat"><strong>3 states</strong><span>Across Northern Nigeria</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================
+         SECTION 6: CTA + FOOTER
+         ================================================ -->
+    <section class="lp-section lp-cta-footer">
+      <!-- CTA Card -->
+      <div class="lp-cta-card">
+        <h2 class="lp-cta-title">Stop losing great candidates<br/>to a broken process.</h2>
+        <p class="lp-cta-sub">Join recruiters across Northern Nigeria who screen faster, collaborate smarter, and hire with confidence.</p>
+        <button class="lp-btn-cta-white" onclick="enterAs('recruiter')">Start Screening Free →</button>
+      </div>
+
+      <!-- Footer -->
+      <footer class="lp-footer">
+        <div class="lp-footer-inner">
+          <div class="lp-footer-brand">
+            <div class="lp-footer-logo">Aptus.</div>
+            <p class="lp-footer-tagline">The Recruitment OS built for Northern Nigeria. Hire faster, smarter, and with less friction.</p>
+            <div class="lp-footer-socials">
+              <a href="#" class="lp-social-link" title="Twitter/X">𝕏</a>
+              <a href="#" class="lp-social-link" title="LinkedIn">in</a>
+              <a href="#" class="lp-social-link" title="Instagram">IG</a>
+            </div>
+          </div>
+          <div class="lp-footer-col">
+            <h4>Company</h4>
+            <a href="#">Home</a>
+            <a href="#">About Us</a>
+            <a href="#">Blog</a>
+            <a href="#">Contact</a>
+          </div>
+          <div class="lp-footer-col">
+            <h4>Product</h4>
+            <a href="#">Features</a>
+            <a href="#" onclick="enterAs('recruiter'); return false;">How It Works</a>
+            <a href="#">Pricing</a>
+            <a href="#" onclick="enterAs('recruiter'); return false;">Get Started</a>
+          </div>
+          <div class="lp-footer-col lp-footer-newsletter">
+            <h4>Stay Updated</h4>
+            <p>Get hiring tips and product updates from the Aptus team.</p>
+            <div class="lp-newsletter-form">
+              <input type="email" placeholder="Email address" class="lp-newsletter-input" />
+              <button class="lp-newsletter-btn">Subscribe →</button>
+            </div>
+          </div>
+        </div>
+        <div class="lp-footer-bottom">
+          <span>© 2025 Aptus. All rights reserved.</span>
+          <div class="lp-footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Security</a>
+          </div>
+        </div>
+      </footer>
+    </section>
+
+  </div><!-- end #landingSections -->
 
   <!-- ============================================
      RECRUITER FLOW
@@ -571,6 +879,15 @@
                   <span class="badge badge-gray" id="totalCount">12 Total</span>
                 </div>
               </div>
+              <!-- Status Filter Bar -->
+              <div class="candidate-filter-bar">
+                <button class="filter-pill active" onclick="setStatusFilter(this, 'all')">All</button>
+                <button class="filter-pill" onclick="setStatusFilter(this, 'unread')">Unread</button>
+                <button class="filter-pill" onclick="setStatusFilter(this, 'pending')">Pending</button>
+                <button class="filter-pill" onclick="setStatusFilter(this, 'shortlisted')">Shortlisted</button>
+                <button class="filter-pill" onclick="setStatusFilter(this, 'interviewing')">Interviewing</button>
+                <button class="filter-pill" onclick="setStatusFilter(this, 'rejected')">Rejected</button>
+              </div>
               <div style="overflow-x:auto;">
                 <table class="ranking-table">
                   <thead>
@@ -583,8 +900,8 @@
                       <th style="width:46px;">#</th>
                       <th>Candidate</th>
                       <th>Experience</th>
-                      <th>AI Match Score</th>
-                      <th>Skills Match</th>
+                      <th class="paid-tier-col">AI Match Score</th>
+                      <th class="paid-tier-col">Skills Match</th>
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
@@ -606,6 +923,68 @@
                 <div id="analyticsTableContainer"></div>
               </div>
             </div>
+            </div>
+            
+            <!-- Split Screen Modal (Level 1 OS) -->
+            <div id="splitScreenOverlay" class="split-screen-overlay" style="display:none;">
+              <div class="split-screen-container">
+                <!-- Left Panel: Profile & Notes -->
+                <div class="split-left-panel">
+                  <div class="split-header">
+                    <button class="btn btn-outline btn-sm" onclick="closeSplitScreen()">← Back</button>
+                    <select class="form-select split-status-dropdown" id="splitStatusDropdown" onchange="updateSplitScreenStatus(this.value)">
+                      <option value="pending">Pending</option>
+                      <option value="shortlisted">Shortlisted</option>
+                      <option value="interviewing">Interviewing</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                  
+                  <div class="split-body">
+                    <h2 id="splitCandidateName" style="margin-bottom: 4px;">Candidate Name</h2>
+                    <p id="splitCandidateEmail" style="color:var(--text-mid); font-size:14px; margin-bottom: 16px;">email@example.com</p>
+                    
+                    <div id="splitPaidContent" class="paid-tier-col">
+                      <div class="ai-summary-box">
+                        <h4>✨ AI Summary</h4>
+                        <div class="ai-match-score">Match: <span id="splitMatchScore">0</span>%</div>
+                        <p id="splitAiSummary" style="font-size:14px; margin-top:8px;">AI summary will appear here...</p>
+                      </div>
+                    </div>
+                    
+                    <div class="split-section">
+                      <h4>Experience & Skills</h4>
+                      <p id="splitExperience" style="font-size:14px; margin-bottom:8px;"></p>
+                      <div id="splitSkills" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                    </div>
+                    
+                    <!-- Team Collaboration Notes -->
+                    <div class="split-section collaboration-section">
+                      <h4>Team Notes</h4>
+                      <div id="splitNotesList" class="notes-list">
+                        <!-- Notes will be injected here -->
+                      </div>
+                      <div class="note-input-area">
+                        <textarea id="newNoteText" class="form-input" placeholder="Type a note (e.g. @HiringManager this looks good)..." rows="2" style="resize:vertical;"></textarea>
+                        <button class="btn btn-primary btn-sm" onclick="submitInternalNote()" style="margin-top:8px; width:100%; justify-content:center;">Add Note</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Right Panel: CV PDF Viewer -->
+                <div class="split-right-panel">
+                  <div class="cv-viewer-container" id="cvViewerContainer">
+                    <iframe id="cvEmbed" src="" width="100%" height="100%" style="border:none;"></iframe>
+                    <div id="cvLoadingState" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                      <div class="spinner"></div>
+                      <p style="margin-top:10px; color:var(--text-mid);">Loading CV...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 

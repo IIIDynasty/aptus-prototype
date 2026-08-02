@@ -199,6 +199,31 @@ app.get('/api/candidates/:candidateId', async (req, res) => {
   }
 });
 
+// Fresh CV SAS URL — regenerate on every open (fixes expired token issue)
+app.get('/api/jobs/:jobId/candidates/:candidateId/cv-url', async (req, res) => {
+  try {
+    const { jobId, candidateId } = req.params;
+    const { type } = req.query; // 'cv' or 'cover'
+    const candidate = await candidateManager.getCandidate(candidateId, jobId);
+    
+    const ext = type === 'cover' ? candidate.coverLetterExtension : candidate.cvExtension;
+    const container = type === 'cover' ? 'cover-letters' : 'cvs';
+    
+    if (!ext) {
+      return res.status(404).json({ error: 'No file uploaded for this candidate' });
+    }
+    
+    // Reconstruct blob name and generate fresh SAS URL (valid for 1 hour)
+    const blobName = `${jobId}/${candidateId}.${ext}`;
+    const freshUrl = azureSecurity.generateBlobSasUrl(container, blobName, 1); // 1 day
+    
+    res.json({ url: freshUrl });
+  } catch (error) {
+    console.error('Failed to generate fresh CV URL:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.patch('/api/candidates/:candidateId/status', async (req, res) => {
   try {
     const { jobId, status, note } = req.body;
@@ -207,6 +232,30 @@ app.patch('/api/candidates/:candidateId/status', async (req, res) => {
     }
     await candidateManager.updateCandidateStatus(req.params.candidateId, jobId, status, note);
     res.json({ success: true, message: `Status updated to ${status}` });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Mark candidate as read (Level 1 OS feature)
+app.put('/api/jobs/:jobId/candidates/:candidateId/read', async (req, res) => {
+  try {
+    const updatedCandidate = await candidateManager.markCandidateAsRead(req.params.candidateId, req.params.jobId);
+    res.json({ success: true, isRead: updatedCandidate.isRead });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Add internal note to candidate (Level 1 OS feature)
+app.post('/api/jobs/:jobId/candidates/:candidateId/notes', async (req, res) => {
+  try {
+    const { note, author } = req.body;
+    if (!note) {
+      return res.status(400).json({ error: 'note text is required' });
+    }
+    const updatedCandidate = await candidateManager.addCandidateNote(req.params.candidateId, req.params.jobId, note, author);
+    res.json({ success: true, notes: updatedCandidate.internalNotes });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

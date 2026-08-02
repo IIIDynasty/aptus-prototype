@@ -12,7 +12,9 @@ class JobPosting {
     this.title = data.title || '';
     this.department = data.department || '';
     this.location = data.location || '';
-    this.experienceLevel = data.experienceLevel || '';
+    this.type = data.type || 'Full-time';
+    this.experienceLevel = data.experienceLevel || 'Mid';
+    this.aiTier = data.aiTier || 'paid'; // 'free' or 'paid'
     this.description = data.description || '';
     this.responsibilities = data.responsibilities || [];
     this.skills = data.skills || [];
@@ -25,6 +27,7 @@ class JobPosting {
     this.shortlistedCount = data.shortlistedCount || 0;
     this.status = data.status || 'active';
     // Hausa AI Translation
+    this.isHausaEnabled = data.isHausaEnabled || false;
     this.hausaEnabled = data.hausaEnabled || false;
     this.hausaTranslation = data.hausaTranslation || null;
   }
@@ -38,7 +41,10 @@ class JobPosting {
       title: this.title,
       department: this.department,
       location: this.location,
+      type: this.type,
       experienceLevel: this.experienceLevel,
+      aiTier: this.aiTier,
+      isHausaEnabled: this.isHausaEnabled,
       description: this.description,
       responsibilities: this.responsibilities,
       skills: this.skills,
@@ -104,6 +110,10 @@ class CandidateApplication {
     this.statusHistory = data.statusHistory || [];
     this.source = data.source || 'direct';
     this.appliedAt = data.appliedAt || new Date().toISOString();
+    
+    // Collaboration & Workflow (Level 1 OS)
+    this.isRead = data.isRead || false;
+    this.internalNotes = data.internalNotes || []; // {author, text, timestamp}
   }
 
   toJSON() {
@@ -127,7 +137,9 @@ class CandidateApplication {
       statusHistory: this.statusHistory,
       source: this.source,
       appliedAt: this.appliedAt,
-      qualifications: this.qualifications
+      qualifications: this.qualifications,
+      isRead: this.isRead,
+      internalNotes: this.internalNotes
     };
   }
 

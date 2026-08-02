@@ -480,6 +480,62 @@ async function getPlatformAnalytics(jobId) {
   }
 }
 
+/**
+ * Mark a candidate as read
+ * @param {string} candidateId - Candidate ID
+ * @param {string} jobId - Job ID
+ * @returns {Promise<object>} Updated candidate
+ */
+async function markCandidateAsRead(candidateId, jobId) {
+  try {
+    const container = getContainer('candidates');
+    
+    const patchOperations = [
+      { op: 'set', path: '/isRead', value: true }
+    ];
+    
+    const { resource: updatedCandidate } = await container.item(candidateId, jobId).patch(patchOperations);
+    return CandidateApplication.fromDocument(updatedCandidate);
+  } catch (error) {
+    console.error(`❌ Failed to mark candidate ${candidateId} as read:`, error.message);
+    throw new Error(`Failed to update candidate: ${error.message}`);
+  }
+}
+
+/**
+ * Add an internal note to a candidate
+ * @param {string} candidateId - Candidate ID
+ * @param {string} jobId - Job ID
+ * @param {string} noteText - The note content
+ * @param {string} authorName - Author of the note
+ * @returns {Promise<object>} Updated candidate
+ */
+async function addCandidateNote(candidateId, jobId, noteText, authorName = 'Recruiter') {
+  try {
+    const candidate = await getCandidate(candidateId, jobId);
+    const container = getContainer('candidates');
+    
+    const newNote = {
+      author: authorName,
+      text: noteText,
+      timestamp: new Date().toISOString()
+    };
+    
+    const notes = candidate.internalNotes || [];
+    notes.push(newNote);
+    
+    const patchOperations = [
+      { op: 'set', path: '/internalNotes', value: notes }
+    ];
+    
+    const { resource: updatedCandidate } = await container.item(candidateId, jobId).patch(patchOperations);
+    return CandidateApplication.fromDocument(updatedCandidate);
+  } catch (error) {
+    console.error(`❌ Failed to add note to candidate ${candidateId}:`, error.message);
+    throw new Error(`Failed to add note: ${error.message}`);
+  }
+}
+
 module.exports = {
   submitApplication,
   getCandidate,
@@ -492,5 +548,7 @@ module.exports = {
   getJobStatistics,
   getPlatformAnalytics,
   scoreCandidate,
-  processCandidateCV
+  processCandidateCV,
+  markCandidateAsRead,
+  addCandidateNote
 };

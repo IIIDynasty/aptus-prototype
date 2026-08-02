@@ -143,6 +143,8 @@ const EXTERNAL_RESOURCES = [
 // ============================================
 function goHome() {
   document.getElementById('landingPage').classList.remove('hidden');
+  const ls = document.getElementById('landingSections');
+  if (ls) ls.style.display = '';
   document.getElementById('recruiterFlow').classList.add('hidden');
   document.getElementById('candidateFlow').classList.add('hidden');
   const roleToggle = document.getElementById('roleToggle');
@@ -152,6 +154,8 @@ function goHome() {
 
 function enterAs(role) {
   document.getElementById('landingPage').classList.add('hidden');
+  const ls = document.getElementById('landingSections');
+  if (ls) ls.style.display = 'none';
   const roleToggle = document.getElementById('roleToggle');
   if (roleToggle) roleToggle.style.display = 'flex';
   currentRole = role;
@@ -902,20 +906,34 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
       
       const yearsExp = c.yearsOfExperience || 0;
       
+      const unreadDot = !c.isRead
+        ? `<span class="unread-dot" title="Not yet viewed"></span>`
+        : '';
+
+      const safeName = (c.fullName || 'Candidate').replace(/"/g, '&quot;');
+      const safeRole = (c.currentRole || 'Applicant').replace(/"/g, '&quot;');
+
       return `
-        <tr>
-          <td style="width:40px; text-align:center;">
+        <tr data-candidate-id="${c.id}" data-status="${status}"
+            class="candidate-row${c.isRead ? '' : ' candidate-unread'}"
+            onclick="handleRowClick(event, '${c.id}', '${jobId}')">
+          <td style="width:40px; text-align:center;" onclick="event.stopPropagation()">
             <input type="checkbox" class="candidate-checkbox" data-id="${c.id}" data-jobid="${jobId}"
               style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary-blue);"
             />
           </td>
           <td><div class="rank-badge ${rankClass}">${idx + 1}</div></td>
           <td>
-            <div class="candidate-name">${c.fullName || 'Unknown'}</div>
-            <div class="candidate-sub">${c.currentRole || 'Applicant'}</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${unreadDot}
+              <div>
+                <div class="candidate-name">${c.fullName || 'Unknown'}</div>
+                <div class="candidate-sub">${c.currentRole || 'Applicant'}</div>
+              </div>
+            </div>
           </td>
           <td class="text-sm">${yearsExp} year${yearsExp !== 1 ? 's' : ''}</td>
-          <td>
+          <td class="paid-tier-col">
             <div class="score-bar-wrap">
               <div class="score-bar-bg">
                 <div class="score-bar-fill ${barClass}" style="width:${score}%;"></div>
@@ -923,28 +941,26 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
               <span class="score-val ${barClass}">${score}%</span>
             </div>
           </td>
-          <td>
+          <td class="paid-tier-col">
             <span class="badge ${skillMatched.length >= skillTotal * 0.75 ? 'badge-success' : skillMatched.length >= skillTotal * 0.5 ? 'badge-gold' : 'badge-danger'}">
               ${skillMatched.length}/${skillTotal} skills
             </span>
           </td>
           <td>${statusBadge}</td>
-          <td>
-            <div class="flex gap-2">
-              <button class="btn btn-outline btn-sm" onclick="openCandidateDetails('${c.id}', '${jobId}')">
-                View
-              </button>
-              <button class="btn btn-success btn-sm" onclick="shortlistCandidate('${c.id}','${jobId}')" ${status==='shortlisted'?'disabled':''}>
-                Shortlist
-              </button>
-              <button class="btn btn-danger btn-sm"
-                data-id="${c.id}" data-jobid="${jobId}"
-                data-name="${(c.fullName||'Candidate').replace(/"/g,'&quot;')}"
-                data-role="${(c.currentRole||'Applicant').replace(/"/g,'&quot;')}"
-                onclick="openRejectionModal(this.dataset.id,this.dataset.jobid,this.dataset.name,this.dataset.role)"
-                ${status==='rejected'?'disabled':''}>
-                Reject
-              </button>
+          <td onclick="event.stopPropagation()" style="position:relative;">
+            <div class="candidate-menu-wrap">
+              <button class="three-dot-btn" onclick="toggleCandidateMenu(event, '${c.id}')">⋮</button>
+              <div class="candidate-dropdown" id="menu-${c.id}" style="display:none;">
+                <button onclick="shortlistCandidate('${c.id}','${jobId}'); closeCandidateMenus()" ${status==='shortlisted'?'disabled':''}>
+                  ✓ Shortlist
+                </button>
+                <button class="danger-option" onclick="openRejectionModal('${c.id}','${jobId}','${safeName}','${safeRole}'); closeCandidateMenus()" ${status==='rejected'?'disabled':''}>
+                  ✕ Reject
+                </button>
+                <button onclick="openCandidateSplitScreen('${c.id}','${jobId}'); closeCandidateMenus()">
+                  👁 View Profile
+                </button>
+              </div>
             </div>
           </td>
         </tr>
@@ -955,12 +971,23 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
     document.getElementById('shortlistCount').textContent = `${shortlistedCount} Shortlisted`;
     document.getElementById('totalCount').textContent = `${sorted.length} Total`;
     
+    // Reset filter to "All" when rankings refresh
+    const filterBar = document.getElementById('candidateStatusFilter');
+    if (filterBar) filterBar.value = 'all';
+    filterRankingsByStatus('all');
+    
     // Render platform analytics if available
     if (analytics && analytics.length > 0) {
       renderPlatformAnalytics(analytics);
     } else {
       document.getElementById('platformAnalyticsCard').style.display = 'none';
     }
+    
+    // Toggle Free vs Paid Tier Views
+    const isFree = job.aiTier === 'free';
+    document.querySelectorAll('.paid-tier-col').forEach(el => el.style.display = isFree ? 'none' : '');
+    document.querySelectorAll('.free-tier-col').forEach(el => el.style.display = isFree ? '' : 'none');
+    window.currentJobAiTier = job.aiTier || 'paid';
     
     // Set up auto-refresh every 30 seconds if enabled
     if (enableAutoRefresh && currentRecruiterView === 'rankings') {
@@ -1115,6 +1142,213 @@ async function openRejectionModal(candidateId, jobId, name, role) {
   } catch (error) {
     console.error('Failed to open rejection modal:', error);
     showToast('Failed to load job details', 'danger', '❌');
+  }
+}
+/* ============================================
+   STATUS FILTER
+   ============================================ */
+function filterRankingsByStatus(filterValue) {
+  const rows = document.querySelectorAll('#rankingTableBody tr[data-candidate-id]');
+  rows.forEach(row => {
+    const status = row.getAttribute('data-status') || 'pending';
+    const isRead = row.querySelector('.read-badge') !== null;
+    
+    if (filterValue === 'all') {
+      row.style.display = '';
+    } else if (filterValue === 'unread') {
+      row.style.display = isRead ? 'none' : '';
+    } else {
+      row.style.display = status === filterValue ? '' : 'none';
+    }
+  });
+}
+
+function setStatusFilter(btn, filterValue) {
+  // Update active pill
+  document.querySelectorAll('.candidate-filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  filterRankingsByStatus(filterValue);
+}
+
+function handleRowClick(event, candidateId, jobId) {
+  // Don't open if clicking a button/input inside the row
+  if (event.target.closest('button, input, select')) return;
+  openCandidateSplitScreen(candidateId, jobId);
+}
+
+function toggleCandidateMenu(event, candidateId) {
+  event.stopPropagation();
+  closeCandidateMenus(); // close any other open menu first
+  const menu = document.getElementById(`menu-${candidateId}`);
+  if (menu) menu.style.display = 'block';
+}
+
+function closeCandidateMenus() {
+  document.querySelectorAll('.candidate-dropdown').forEach(m => m.style.display = 'none');
+}
+
+// Close menus when clicking anywhere else
+document.addEventListener('click', closeCandidateMenus);
+
+/* ============================================
+   LEVEL 1 OS: SPLIT-SCREEN REVIEW
+   ============================================ */
+let currentSplitCandidateId = null;
+let currentSplitJobId = null;
+
+async function openCandidateSplitScreen(candidateId, jobId) {
+  try {
+    currentSplitCandidateId = candidateId;
+    currentSplitJobId = jobId;
+    
+    document.getElementById('splitScreenOverlay').style.display = 'flex';
+    document.getElementById('cvLoadingState').style.display = 'block';
+    document.getElementById('cvEmbed').src = '';
+    
+    // Fetch candidate details
+    const response = await fetch(`${API_BASE}/candidates/${candidateId}?jobId=${jobId}`);
+    if (!response.ok) throw new Error('Failed to fetch candidate details');
+    const c = await response.json();
+    
+    // Populate left panel
+    document.getElementById('splitCandidateName').textContent = c.fullName || 'Unknown Candidate';
+    document.getElementById('splitCandidateEmail').textContent = c.email || '-';
+    document.getElementById('splitStatusDropdown').value = c.status || 'pending';
+    document.getElementById('splitExperience').textContent = c.yearsOfExperience ? `${c.yearsOfExperience} years, ${c.currentRole || ''}` : '-';
+    
+    // Skills
+    const skillsContainer = document.getElementById('splitSkills');
+    if (c.skills && c.skills.length > 0) {
+      skillsContainer.innerHTML = c.skills.map(s => `<span class="badge badge-gray">${s}</span>`).join('');
+    } else {
+      skillsContainer.innerHTML = '<span class="text-sm text-mid">No skills listed</span>';
+    }
+    
+    // AI Tier View
+    const isFree = window.currentJobAiTier === 'free';
+    document.getElementById('splitPaidContent').style.display = isFree ? 'none' : 'block';
+    
+    if (!isFree) {
+      document.getElementById('splitMatchScore').textContent = (c.scores && c.scores.total) || 0;
+      document.getElementById('splitAiSummary').textContent = c.achievements || c.summary || 'No AI summary generated.';
+    }
+    
+    // Render Notes
+    renderInternalNotes(c.internalNotes || []);
+    
+    // Load CV PDF using fresh SAS URL (avoids expired token issue)
+    const cvContainer = document.getElementById('cvLoadingState');
+    const cvEmbed = document.getElementById('cvEmbed');
+    
+    if (c.cvExtension) {
+      try {
+        const cvRes = await fetch(`${API_BASE}/jobs/${jobId}/candidates/${candidateId}/cv-url`);
+        if (cvRes.ok) {
+          const { url } = await cvRes.json();
+          cvEmbed.src = url;
+          cvEmbed.onload = () => { cvContainer.style.display = 'none'; };
+          cvEmbed.onerror = () => { cvContainer.innerHTML = '<p style="color:var(--danger);">Failed to load CV.</p>'; };
+        } else {
+          cvContainer.innerHTML = '<p>Could not load CV.</p>';
+        }
+      } catch (e) {
+        cvContainer.innerHTML = '<p>Could not load CV.</p>';
+      }
+    } else {
+      cvContainer.innerHTML = '<p style="color:var(--text-mid);">No CV uploaded by this candidate.</p>';
+    }
+    
+    // Mark as read API call — update badge AFTER API confirms
+    if (!c.isRead) {
+      fetch(`${API_BASE}/jobs/${jobId}/candidates/${candidateId}/read`, { method: 'PUT' })
+        .then(res => {
+          if (!res.ok) return;
+          // Target row by data-id attribute reliably
+          const row = document.querySelector(`tr[data-candidate-id="${candidateId}"]`);
+          if (row) {
+            row.classList.remove('candidate-unread');
+            const dot = row.querySelector('.unread-dot');
+            if (dot) dot.remove();
+          }
+        }).catch(err => console.error('Failed to mark as read', err));
+    }
+    
+  } catch (error) {
+    console.error('Split screen error:', error);
+    showToast('Failed to load profile', 'danger', '❌');
+    closeSplitScreen();
+  }
+}
+
+function closeSplitScreen() {
+  document.getElementById('splitScreenOverlay').style.display = 'none';
+  document.getElementById('cvEmbed').src = ''; // clear iframe memory
+  currentSplitCandidateId = null;
+  currentSplitJobId = null;
+}
+
+function renderInternalNotes(notes) {
+  const container = document.getElementById('splitNotesList');
+  if (notes.length === 0) {
+    container.innerHTML = '<p class="text-sm text-mid">No notes yet. Be the first to comment!</p>';
+    return;
+  }
+  
+  container.innerHTML = notes.map(n => `
+    <div class="note-item">
+      <div class="note-header">
+        <span class="note-author">${n.author}</span>
+        <span>${new Date(n.timestamp).toLocaleDateString()}</span>
+      </div>
+      <div class="note-text">${n.text}</div>
+    </div>
+  `).join('');
+  
+  container.scrollTop = container.scrollHeight;
+}
+
+async function submitInternalNote() {
+  const textInput = document.getElementById('newNoteText');
+  const note = textInput.value.trim();
+  if (!note || !currentSplitCandidateId) return;
+  
+  textInput.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/jobs/${currentSplitJobId}/candidates/${currentSplitCandidateId}/notes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ note: note, author: 'Recruiter' })
+    });
+    
+    if (!res.ok) throw new Error('Failed to add note');
+    
+    const data = await res.json();
+    renderInternalNotes(data.notes);
+    textInput.value = '';
+  } catch (error) {
+    showToast(error.message, 'danger', '❌');
+  } finally {
+    textInput.disabled = false;
+  }
+}
+
+async function updateSplitScreenStatus(newStatus) {
+  if (!currentSplitCandidateId) return;
+  
+  try {
+    const res = await fetch(`${API_BASE}/candidates/${currentSplitCandidateId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId: currentSplitJobId, status: newStatus })
+    });
+    
+    if (!res.ok) throw new Error('Failed to update status');
+    showToast(`Status updated to ${newStatus}`, 'success', '✓');
+    
+    // Refresh background list softly
+    renderRankings(currentSplitJobId, false);
+  } catch (error) {
+    showToast(error.message, 'danger', '❌');
   }
 }
 
