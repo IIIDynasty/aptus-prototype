@@ -486,21 +486,13 @@
      RECRUITER FLOW
      ============================================ -->
   <div id="recruiterFlow" class="hidden">
-    <!-- Top Navigation for Recruiter Flow -->
-    <nav class="nav" id="mainNav">
-      <a class="nav-logo-text-only" href="#" onclick="goHome(); return false;">
-        Aptus.
-      </a>
-      <!-- Role toggle hidden for prototype -->
-      <div class="nav-role-toggle" style="display:none !important;">
-        <button class="toggle-btn active" id="toggleRecruiter" onclick="switchRole('recruiter')">Recruiter</button>
-        <button class="toggle-btn" id="toggleCandidate" onclick="switchRole('candidate')">Candidate</button>
-      </div>
-    </nav>
-
     <div class="app-layout">
       <!-- Sidebar -->
       <aside class="sidebar">
+        <div class="sidebar-logo-container" onclick="goHome()">
+          <img src="images/Aptus_logo_transparent.png" class="sidebar-logo-img" alt="Aptus" />
+        </div>
+        
         <div class="sidebar-section-label">Recruiter</div>
         <button class="sidebar-link active" id="sb-dashboard" onclick="recruiterNav('dashboard')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -510,7 +502,7 @@
             <rect x="14" y="14" width="7" height="7" />
             <rect x="3" y="14" width="7" height="7" />
           </svg>
-          Dashboard
+          <span class="link-text">Dashboard</span>
         </button>
         <button class="sidebar-link" id="sb-create" onclick="recruiterNav('create')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -519,7 +511,7 @@
             <line x1="12" y1="8" x2="12" y2="16" />
             <line x1="8" y1="12" x2="16" y2="12" />
           </svg>
-          Post a Job
+          <span class="link-text">Post a Job</span>
         </button>
         <button class="sidebar-link" id="sb-rankings" onclick="recruiterNav('rankings')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -528,7 +520,7 @@
             <line x1="12" y1="20" x2="12" y2="4" />
             <line x1="6" y1="20" x2="6" y2="14" />
           </svg>
-          Candidate Rankings
+          <span class="link-text">Rankings</span>
         </button>
         <button class="sidebar-link" id="sb-communities" onclick="recruiterNav('communities')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -538,7 +530,18 @@
             <path d="M23 21v-2a4 4 0 00-3-3.87" />
             <path d="M16 3.13a4 4 0 010 7.75" />
           </svg>
-          Reach More Qualified Candidates Faster
+          <span class="link-text">Reach</span>
+        </button>
+        
+        <div class="sidebar-spacer" style="flex: 1;"></div>
+        
+        <button class="sidebar-link sidebar-logout-btn" onclick="goHome()" title="Logout / Back to Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span class="link-text">Logout</span>
         </button>
       </aside>
 
@@ -620,20 +623,15 @@
                 <div class="stat-value" id="stat-shortlisted">-</div>
                 <div class="stat-sub">Loading...</div>
               </div>
-              <div class="stat-card">
-                <div class="stat-label">Avg. Match Score</div>
-                <div class="stat-value gold" id="stat-avg-score">-</div>
-                <div class="stat-sub">Loading...</div>
-              </div>
             </div>
 
-            <div class="card">
-              <div class="card-header">
+            <div class="card job-postings-card">
+              <div class="card-header" style="background:transparent; border-bottom: 1px solid rgba(0,0,0,0.07);">
                 <span class="card-title">Active Job Postings</span>
                 <button class="btn btn-outline btn-sm" onclick="recruiterNav('create')">+ New Posting</button>
               </div>
-              <div class="card-body" style="padding:0;">
-                <div id="jobListContainer" class="job-list" style="padding:20px 24px;"></div>
+              <div class="card-body" style="padding:16px 0 0 0; overflow:visible;">
+                <div id="jobListContainer" class="job-list" style="overflow:visible;"></div>
               </div>
             </div>
           </div>
@@ -1058,7 +1056,6 @@
           </div>
 
         </div>
-    </div>
 
     <!-- Communities View -->
     <div id="view-communities" class="hidden animate-in">

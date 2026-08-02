@@ -449,15 +449,26 @@ function renderDashboardWithJobs(jobs) {
             </div>
             <div class="job-item-badges">
               <span class="badge badge-gray">${applicants} Applicants</span>
-              <span class="badge badge-success">${shortlisted} Shortlisted</span>
-              <span class="badge badge-gold">Active</span>
+              <span class="badge badge-gold badge-status-toggle" id="status-badge-${job.id}" onclick="event.stopPropagation(); toggleJobStatus('${job.id}', this)" title="Click to toggle status">${job.status === 'completed' ? 'Complete' : 'Active'}</span>
             </div>
           </div>
         </div>
         <div class="job-item-actions">
-          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); copyJobLink('${job.id}')" title="Copy application link">📋 Copy Link</button>
-          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); viewJobRankings('${job.id}')" title="View ranked candidates">View Rankings →</button>
-          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteJob('${job.id}', '${job.title.replace(/'/g, "\\'")}')">🗑️</button>
+          <button class="btn-ellipsis" onclick="event.stopPropagation(); toggleJobActionsDropdown('${job.id}', event)" title="More options">···</button>
+          <div class="job-actions-dropdown" id="dropdown-${job.id}">
+            <button class="dropdown-action-btn" onclick="event.stopPropagation(); copyJobLink('${job.id}'); closeAllDropdowns()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy Link
+            </button>
+            <button class="dropdown-action-btn" onclick="event.stopPropagation(); viewJobRankings('${job.id}'); closeAllDropdowns()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              View Rankings
+            </button>
+            <button class="dropdown-action-btn danger" onclick="event.stopPropagation(); deleteJob('${job.id}', '${job.title.replace(/'/g, "\\'")}')); closeAllDropdowns()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -467,15 +478,42 @@ function renderDashboardWithJobs(jobs) {
   document.getElementById('stat-applicants').textContent = totalApplicants;
   document.getElementById('stat-shortlisted').textContent = totalShortlisted;
   document.getElementById('stat-active').textContent = jobs.length;
-  
-  // Update average match score if we have data
-  if (scoreCount > 0) {
-    const avgScore = Math.round(totalScores / scoreCount);
-    const avgElement = document.querySelector('.stat-value.gold');
-    if (avgElement && avgElement.parentElement.querySelector('.stat-label').textContent === 'Avg. Match Score') {
-      avgElement.textContent = `${avgScore}%`;
-    }
+}
+
+// Toggle job status badge between Active / Complete
+function toggleJobStatus(jobId, badgeEl) {
+  const isActive = badgeEl.textContent.trim() === 'Active';
+  if (isActive) {
+    badgeEl.textContent = 'Complete';
+    badgeEl.classList.remove('badge-gold');
+    badgeEl.classList.add('badge-gray');
+  } else {
+    badgeEl.textContent = 'Active';
+    badgeEl.classList.remove('badge-gray');
+    badgeEl.classList.add('badge-gold');
   }
+}
+
+// Toggle job actions dropdown (ellipsis)
+function toggleJobActionsDropdown(jobId, event) {
+  closeAllDropdowns();
+  const dropdown = document.getElementById(`dropdown-${jobId}`);
+  if (dropdown) {
+    dropdown.classList.add('open');
+    // Lift the parent job-item above siblings so dropdown is not clipped
+    const jobItem = dropdown.closest('.job-item');
+    if (jobItem) jobItem.classList.add('dropdown-open');
+  }
+  // Close when clicking outside
+  setTimeout(() => {
+    document.addEventListener('click', closeAllDropdowns, { once: true });
+  }, 10);
+}
+
+// Close all open job action dropdowns
+function closeAllDropdowns() {
+  document.querySelectorAll('.job-actions-dropdown.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.job-item.dropdown-open').forEach(el => el.classList.remove('dropdown-open'));
 }
 
 function renderDashboard() {
