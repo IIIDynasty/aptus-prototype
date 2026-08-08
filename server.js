@@ -163,13 +163,40 @@ app.post('/api/candidates', async (req, res) => {
     const sourceUrl = req.headers.referer || req.headers.origin;
     const candidate = await candidateManager.submitApplication(req.body, sourceUrl);
     
-    // Trigger scoring asynchronously (don't wait)
-    candidateManager.scoreCandidate(candidate.id, candidate.jobId)
-      .catch(err => console.error('Scoring failed:', err.message));
+    // NOTE: Auto-scoring on application submission is disabled for free plans (future paid plan feature)
+    // candidateManager.scoreCandidate(candidate.id, candidate.jobId)
+    //   .catch(err => console.error('Scoring failed:', err.message));
     
     res.json(candidate);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/jobs/:jobId/candidates/bulk-score', async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const { candidateIds } = req.body;
+    
+    if (!candidateIds || !Array.isArray(candidateIds)) {
+      return res.status(400).json({ error: 'candidateIds array is required' });
+    }
+    
+    console.log(`🤖 Bulk scoring triggered for ${candidateIds.length} candidate(s) under job ${jobId}`);
+    
+    let scoredCount = 0;
+    for (const candidateId of candidateIds) {
+      try {
+        await candidateManager.scoreCandidate(candidateId, jobId);
+        scoredCount++;
+      } catch (err) {
+        console.error(`Error scoring candidate ${candidateId} during bulk scoring:`, err.message);
+      }
+    }
+    
+    res.json({ success: true, scored: scoredCount });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

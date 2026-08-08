@@ -926,8 +926,9 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
     
     const tbody = document.getElementById('rankingTableBody');
     tbody.innerHTML = sorted.map((c, idx) => {
-      const score = (c.scores && c.scores.total) || 0;
-      const barClass = score >= 80 ? 'score-high' : score >= 55 ? 'score-mid' : 'score-low';
+      const isScored = c.scores && c.scores.total !== null && c.scores.total !== undefined;
+      const score = isScored ? c.scores.total : null;
+      const barClass = isScored ? (score >= 80 ? 'score-high' : score >= 55 ? 'score-mid' : 'score-low') : '';
       const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'rank-n';
       const status = c.status || 'pending';
       
@@ -937,12 +938,26 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
           ? '<span class="badge badge-danger">✕ Rejected</span>'
           : '<span class="badge badge-gray">Pending</span>';
       
-      const skillMatched = c.skills ? c.skills.filter(s => 
-        job.skills.some(js => js.toLowerCase() === s.toLowerCase())
+      // Skills Match logic fallback (exact match client-side)
+      const hasSkills = c.skills && Array.isArray(c.skills) && c.skills.length > 0;
+      const skillMatched = hasSkills ? c.skills.filter(s => 
+        job.skills && job.skills.some(js => js.toLowerCase() === s.toLowerCase())
       ) : [];
-      const skillTotal = job.skills.length;
+      const skillTotal = (job.skills && job.skills.length) || 0;
       
-      const yearsExp = c.yearsOfExperience || 0;
+      const skillClass = hasSkills && skillTotal > 0
+        ? (skillMatched.length >= skillTotal * 0.75 ? 'badge-success' : skillMatched.length >= skillTotal * 0.5 ? 'badge-gold' : 'badge-danger')
+        : '';
+      
+      const skillsMatchHtml = hasSkills && skillTotal > 0
+        ? `<span class="badge ${skillClass}">${skillMatched.length}/${skillTotal} skills</span>`
+        : '-';
+
+      // Experience fallback
+      const yearsExp = c.yearsOfExperience;
+      const experienceText = (yearsExp !== undefined && yearsExp !== null) 
+        ? `${yearsExp} year${yearsExp !== 1 ? 's' : ''}` 
+        : '-';
       
       const unreadDot = !c.isRead
         ? `<span class="unread-dot" title="Not yet viewed"></span>`
@@ -950,6 +965,15 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
 
       const safeName = (c.fullName || 'Candidate').replace(/"/g, '&quot;');
       const safeRole = (c.currentRole || 'Applicant').replace(/"/g, '&quot;');
+
+      const scoreHtml = isScored
+        ? `<div class="score-bar-wrap">
+            <div class="score-bar-bg">
+              <div class="score-bar-fill ${barClass}" style="width:${score}%;"></div>
+            </div>
+            <span class="score-val ${barClass}">${score}%</span>
+          </div>`
+        : `<span style="font-weight: 500; color: var(--text-mid); font-style: italic;">pending</span>`;
 
       return `
         <tr data-candidate-id="${c.id}" data-status="${status}"
@@ -970,19 +994,12 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
               </div>
             </div>
           </td>
-          <td class="text-sm">${yearsExp} year${yearsExp !== 1 ? 's' : ''}</td>
+          <td class="text-sm">${experienceText}</td>
           <td class="paid-tier-col">
-            <div class="score-bar-wrap">
-              <div class="score-bar-bg">
-                <div class="score-bar-fill ${barClass}" style="width:${score}%;"></div>
-              </div>
-              <span class="score-val ${barClass}">${score}%</span>
-            </div>
+            ${scoreHtml}
           </td>
           <td class="paid-tier-col">
-            <span class="badge ${skillMatched.length >= skillTotal * 0.75 ? 'badge-success' : skillMatched.length >= skillTotal * 0.5 ? 'badge-gold' : 'badge-danger'}">
-              ${skillMatched.length}/${skillTotal} skills
-            </span>
+            ${skillsMatchHtml}
           </td>
           <td>${statusBadge}</td>
           <td onclick="event.stopPropagation()" style="position:relative;">
@@ -1009,9 +1026,9 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
     document.getElementById('shortlistCount').textContent = `${shortlistedCount} Shortlisted`;
     document.getElementById('totalCount').textContent = `${sorted.length} Total`;
     
-    // Reset filter to "All" when rankings refresh
-    const filterBar = document.getElementById('candidateStatusFilter');
-    if (filterBar) filterBar.value = 'all';
+    // Reset filter label to "All" when rankings refresh
+    const labelEl = document.getElementById('selected-status-label');
+    if (labelEl) labelEl.textContent = 'All';
     filterRankingsByStatus('all');
     
     // Render platform analytics if available
@@ -2394,4 +2411,101 @@ function toggleHausaLanguage(isHausa) {
     document.getElementById('hausaCandToggleDot').style.transform = 'translateX(0)';
   }
 }
+
+// ============================================
+// STATUS FILTER & BULK MESSAGE DROPDOWNS
+// ============================================
+
+// Toggles the Message dropdown
+function toggleMessageDropdown(event) {
+  event.stopPropagation();
+  closeAllRecruiterDropdowns();
+  const dropdown = document.getElementById('messageDropdown');
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+  }
+  // Setup global dismiss
+  setTimeout(() => {
+    document.addEventListener('click', closeAllRecruiterDropdowns, { once: true });
+  }, 10);
+}
+
+function closeMessageDropdown() {
+  const dropdown = document.getElementById('messageDropdown');
+  if (dropdown) dropdown.style.display = 'none';
+}
+
+// Toggles the Status filter dropdown
+function toggleStatusFilterDropdown(event) {
+  event.stopPropagation();
+  closeAllRecruiterDropdowns();
+  const dropdown = document.getElementById('statusFilterDropdown');
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+  }
+  // Setup global dismiss
+  setTimeout(() => {
+    document.addEventListener('click', closeAllRecruiterDropdowns, { once: true });
+  }, 10);
+}
+
+function closeStatusFilterDropdown() {
+  const dropdown = document.getElementById('statusFilterDropdown');
+  if (dropdown) dropdown.style.display = 'none';
+}
+
+// Closes any open recruiter dropdown menus
+function closeAllRecruiterDropdowns() {
+  closeMessageDropdown();
+  closeStatusFilterDropdown();
+}
+
+// Triggers status filtering on table and updates button UI
+function applyStatusFilter(filterValue, label) {
+  const labelEl = document.getElementById('selected-status-label');
+  if (labelEl) labelEl.textContent = label;
+  filterRankingsByStatus(filterValue);
+}
+
+// Bulk AI Scoring trigger for selected candidates
+async function bulkScoreCandidates() {
+  const checkboxes = document.querySelectorAll('.candidate-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('Please select at least one candidate to score', 'danger', '⚠️');
+    return;
+  }
+
+  const jobId = checkboxes[0].dataset.jobid;
+  const candidateIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+
+  showProcessing('AI Scoring...', `Running scoring algorithms on ${candidateIds.length} candidate(s). This can take up to a minute.`);
+
+  try {
+    const res = await fetch(`/api/jobs/${jobId}/candidates/bulk-score`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ candidateIds })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Scoring failed');
+    }
+
+    hideProcessing();
+    showToast(`✅ Successfully scored ${data.scored} candidate(s)`, 'success', '✨');
+    
+    // Uncheck all checkboxes
+    checkboxes.forEach(cb => cb.checked = false);
+    const selectAllCheckbox = document.getElementById('selectAllCandidates');
+    if (selectAllCheckbox) selectAllCheckbox.checked = false;
+    
+    await renderRankings(jobId, false);
+  } catch (err) {
+    hideProcessing();
+    console.error('Bulk scoring error:', err);
+    showToast(err.message || 'Error executing AI scoring', 'danger', '✕');
+  }
+}
+
 

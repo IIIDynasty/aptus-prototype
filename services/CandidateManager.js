@@ -386,7 +386,6 @@ async function processCandidateCV(candidateId, jobId, blobName, extension) {
     // Process CV
     const cvData = await processCVFile(blobClient, candidate.skills, extension);
     
-    // Update candidate with CV data
     await updateCandidate(candidateId, jobId, {
       skills: cvData.skills, // Merged skills
       cvEducation: cvData.education,
@@ -394,8 +393,8 @@ async function processCandidateCV(candidateId, jobId, blobName, extension) {
       cvExtractedText: cvData.extractedText
     });
     
-    // Re-calculate score with updated data
-    await scoreCandidate(candidateId, jobId);
+    // Re-calculate score with updated data is disabled on CV upload (triggered manually by recruiter)
+    // await scoreCandidate(candidateId, jobId);
     
     console.log(`✅ CV processed for candidate ${candidateId}`);
     
