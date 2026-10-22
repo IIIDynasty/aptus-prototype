@@ -181,30 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
   };
 
-  // --- Waitlist Modal Logic ---
-  const openWaitlistWithQuery = (queryText = '') => {
-    modalFormView.style.display  = 'block';
-    modalSuccessView.style.display = 'none';
+  // --- Waitlist Form Redirection ---
+  const TALLY_WAITLIST_URL = 'https://tally.so/r/xXGLLG';
 
-    const cleanQuery = (queryText || '').trim();
-    if (cleanQuery) {
-      queryPreviewGroup.style.display = 'block';
-      modalQueryPreview.textContent   = `"${cleanQuery}"`;
-    } else {
-      queryPreviewGroup.style.display = 'none';
-      modalQueryPreview.textContent   = '';
-    }
-
-    openModal(waitlistModal);
-    setTimeout(() => {
-      const firstInput = document.getElementById('fullName');
-      if (firstInput) firstInput.focus();
-    }, 150);
+  const openWaitlistWithQuery = () => {
+    window.open(TALLY_WAITLIST_URL, '_blank', 'noopener,noreferrer');
   };
 
-  if (navWaitlistBtn)      navWaitlistBtn.addEventListener('click', () => openWaitlistWithQuery());
   if (heroWaitlistBtn)     heroWaitlistBtn.addEventListener('click', () => openWaitlistWithQuery());
-  if (problemsWaitlistBtn) problemsWaitlistBtn.addEventListener('click', () => openWaitlistWithQuery());
   if (finalCtaBtn)         finalCtaBtn.addEventListener('click', () => openWaitlistWithQuery());
   if (closeModalBtn)       closeModalBtn.addEventListener('click', () => closeModal(waitlistModal));
   if (successDoneBtn)      successDoneBtn.addEventListener('click', () => closeModal(waitlistModal));
