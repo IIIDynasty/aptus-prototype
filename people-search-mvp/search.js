@@ -258,9 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!candidates || candidates.length === 0) {
       studioCandidatesGrid.innerHTML = `
-        <div style="padding:2.5rem; text-align:center; background:#F8FAFC; border-radius:12px; border:1px solid #E2E8F0;">
-          <h4 style="font-size:1.1rem; color:#0B0F19; font-weight:700; margin:0 0 0.35rem;">No Candidates Matched Strict Filters</h4>
-          <p style="color:#64748B; font-size:0.88rem; margin:0;">Try broadening your role title, industry, or target location in Nigeria.</p>
+        <div style="padding:2.5rem; text-align:center; background:rgba(255, 255, 255, 0.03); border-radius:12px; border:1px solid rgba(255, 255, 255, 0.1);">
+          <h4 style="font-size:1.1rem; color:#FFFFFF; font-weight:700; margin:0 0 0.35rem; font-family:'Plus Jakarta Sans', sans-serif;">No Candidates Matched Strict Filters</h4>
+          <p style="color:#A1A1AA; font-size:0.88rem; margin:0;">Try broadening your role title, industry, or target location in Nigeria.</p>
         </div>
       `;
       return;
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <!-- Education Row -->
         <div class="card-bullet-row">
           <div class="bullet-circle-icon edu-icon">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="#1E293B">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#CBD5E1">
               <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
             </svg>
           </div>
@@ -442,9 +442,9 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
         const isShortlisted = btn.classList.toggle('shortlisted');
         btn.querySelector('span').textContent = isShortlisted ? 'Shortlisted ✓' : 'Shortlist';
-        btn.style.color = isShortlisted ? '#15803D' : '';
-        btn.style.borderColor = isShortlisted ? '#86EFAC' : '';
-        btn.style.background = isShortlisted ? '#F0FDF4' : '';
+        btn.style.color = isShortlisted ? '#4ADE80' : '';
+        btn.style.borderColor = isShortlisted ? 'rgba(74, 222, 128, 0.4)' : '';
+        btn.style.background = isShortlisted ? 'rgba(74, 222, 128, 0.12)' : '';
       });
     });
   };
@@ -521,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (drawerSignalsGrid) {
       if (topSignals.length === 0) {
         drawerSignalsGrid.innerHTML = `
-          <div style="grid-column:1/-1; padding:1.25rem; background:#F8FAFC; border-radius:8px; border:1px solid #E2E8F0; text-align:center; color:#64748B; font-size:0.86rem;">
+          <div style="grid-column:1/-1; padding:1.25rem; background:rgba(255, 255, 255, 0.03); border-radius:8px; border:1px solid rgba(255, 255, 255, 0.1); text-align:center; color:#A1A1AA; font-size:0.86rem;">
             No immediate switching trigger detected. Standard career mobility considerations apply.
           </div>
         `;

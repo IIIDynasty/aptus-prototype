@@ -3765,3 +3765,284 @@ body.render-dark-theme {
   }
 }
 
+/* ==========================================================================
+   Render Dark Theme — Sourcing Studio & Candidate Cards Overrides
+   ========================================================================== */
+.render-dark-theme .candidate-card-live {
+  background-color: rgba(14, 14, 20, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .candidate-card-live:hover {
+  border-color: rgba(138, 75, 255, 0.45) !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+.render-dark-theme .candidate-card-name {
+  color: #FFFFFF !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.render-dark-theme .drawer-name {
+  color: #FFFFFF !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.render-dark-theme .drawer-subtitle {
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .drawer-location {
+  color: #94A3B8 !important;
+}
+
+.render-dark-theme .bullet-text {
+  color: #CBD5E1 !important;
+}
+
+.render-dark-theme .bullet-text strong {
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .bullet-circle-icon.company-icon {
+  background: rgba(85, 13, 242, 0.2) !important;
+}
+
+.render-dark-theme .bullet-circle-icon.edu-icon {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.render-dark-theme .card-shortlist-btn {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #E4E4E7 !important;
+}
+
+.render-dark-theme .card-action-btn {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .card-footer-toolbar {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.render-dark-theme .footer-salary-tag {
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .footer-salary-tag strong {
+  color: #F59E0B !important;
+}
+
+.render-dark-theme .footer-market-signal {
+  background: rgba(85, 13, 242, 0.15) !important;
+  border: 1px solid rgba(85, 13, 242, 0.35) !important;
+  color: #C084FC !important;
+}
+
+.render-dark-theme .candidate-drawer-panel {
+  background-color: #0B0B11 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .drawer-header {
+  background-color: transparent !important;
+  border-bottom: none !important;
+}
+
+.render-dark-theme .drawer-close-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .drawer-close-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .drawer-tabs-bar {
+  background-color: #0B0B11 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.render-dark-theme .drawer-tab-btn {
+  color: #71717A !important;
+}
+
+.render-dark-theme .drawer-tab-btn.active {
+  color: #FFFFFF !important;
+  border-bottom-color: #550DF2 !important;
+}
+
+.render-dark-theme .drawer-signals-title {
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .signal-card-box {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .signal-card-box.variant-green {
+  border-color: rgba(74, 222, 128, 0.35) !important;
+  background-color: rgba(74, 222, 128, 0.04) !important;
+}
+
+.render-dark-theme .signal-card-box.variant-gold {
+  border-color: rgba(251, 191, 36, 0.35) !important;
+  background-color: rgba(251, 191, 36, 0.04) !important;
+}
+
+.render-dark-theme .signal-card-title {
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .signal-card-subtitle {
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .drawer-summary-card {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.render-dark-theme .summary-card-header {
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .summary-card-body {
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .btn-summary-outline {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #E4E4E7 !important;
+}
+
+.render-dark-theme .btn-summary-outline:hover {
+  background: rgba(85, 13, 242, 0.2) !important;
+  border-color: #550DF2 !important;
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .drawer-box-market {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.render-dark-theme .assessment-card {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.render-dark-theme .assessment-label {
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .assessment-explanation {
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .signal-evidence-card {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.render-dark-theme .evidence-text {
+  color: #E2E8F0 !important;
+}
+
+.render-dark-theme .evidence-source {
+  color: #71717A !important;
+}
+
+.render-dark-theme .drawer-box-salary {
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.render-dark-theme .salary-highlight-card {
+  background-color: rgba(245, 158, 11, 0.06) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+}
+
+.render-dark-theme .salary-figure {
+  color: #FBBF24 !important;
+}
+
+.render-dark-theme .salary-provenance {
+  color: #A1A1AA !important;
+}
+
+.render-dark-theme .salary-disclaimer {
+  color: #71717A !important;
+}
+
+.render-dark-theme .drawer-box-contact {
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.render-dark-theme .contact-reveal-card {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.render-dark-theme .contact-card-prompt p {
+  color: #CBD5E1 !important;
+}
+
+.render-dark-theme .revealed-email-row {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.render-dark-theme .email-value {
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .education-item {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.render-dark-theme .education-item h5 {
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .skill-tag {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #E2E8F0 !important;
+}
+
+.render-dark-theme .timeline-role {
+  color: #FFFFFF !important;
+}
+
+.render-dark-theme .timeline-company {
+  color: #C084FC !important;
+}
+
+.render-dark-theme .timeline-period {
+  color: #71717A !important;
+}
+
+.render-dark-theme .timeline-container::before {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.render-dark-theme .timeline-item::before {
+  background-color: #550DF2 !important;
+  border-color: #000000 !important;
+}
+
