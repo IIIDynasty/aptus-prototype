@@ -3553,20 +3553,93 @@ body.render-dark-theme {
 
 .render-dark-theme .site-footer {
   background-color: #000000 !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-top: none !important;
   color: #A1A1AA !important;
+  padding-top: 4rem !important;
+  padding-bottom: 3rem !important;
+  position: relative;
+  z-index: 1;
 }
 
-.render-dark-theme .footer-nav-title {
+.render-dark-theme .footer-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: #FFFFFF !important;
+  margin-bottom: 1.15rem !important;
+}
+
+.render-dark-theme .footer-tagline {
+  color: #A1A1AA !important;
+  font-size: 0.92rem !important;
+  line-height: 1.55 !important;
+  margin-top: 0.85rem !important;
+}
+
+.render-dark-theme .footer-links-list a {
+  color: #A1A1AA !important;
+  text-decoration: none;
+  font-size: 0.92rem !important;
+  transition: color 0.2s ease;
+}
+
+.render-dark-theme .footer-links-list a:hover {
   color: #FFFFFF !important;
 }
 
-.render-dark-theme .footer-link {
+.render-dark-theme .footer-contact-text {
   color: #A1A1AA !important;
+  font-size: 0.92rem !important;
+  line-height: 1.55 !important;
+  margin-bottom: 0.85rem !important;
 }
 
-.render-dark-theme .footer-link:hover {
+.render-dark-theme .footer-email-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  color: #60A5FA !important;
+  font-weight: 500 !important;
+  font-size: 0.92rem !important;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease;
+}
+
+.render-dark-theme .footer-email-link:hover {
+  opacity: 0.85;
+}
+
+.render-dark-theme .footer-top {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.render-dark-theme .footer-bottom {
+  border-top: none !important;
+  padding-top: 2rem !important;
+  color: #71717A !important;
+  font-size: 0.85rem !important;
+}
+
+.render-dark-theme .legal-link-btn {
+  background: none !important;
+  border: none !important;
+  color: #71717A !important;
+  font-size: 0.85rem !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+  transition: color 0.2s ease;
+}
+
+.render-dark-theme .legal-link-btn:hover {
   color: #FFFFFF !important;
+}
+
+.render-dark-theme .legal-separator {
+  color: #52525B !important;
+  margin: 0 0.5rem;
 }
 
 /* Modals in Dark Theme */
