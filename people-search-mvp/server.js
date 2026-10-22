@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { parseRecruiterQuery, buildLocationClause } from './services/groqParser.js';
-import { searchCandidates } from './services/pdlService.js';
+import { searchCandidates, matchTalentPoolCandidates, NIGERIAN_TALENT_POOL } from './services/pdlService.js';
 import { evaluateCandidateSignals, evaluateLikelyToSwitchSignals } from './services/marketInsightsEngine.js';
 import { getSalaryBenchmark } from './services/salaryBenchmarkService.js';
 import { findCandidateEmail } from './services/hunterService.js';
@@ -14,6 +14,48 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+
+/**
+ * Strict role relevance guardrail:
+ * Checks whether candidate's current or historical titles have substantive keyword overlap
+ * with the target role. Prevents substring search leaks (e.g. '%cro%' matching 'microbiology').
+ */
+function isCandidateRoleRelevant(candidate, targetRole, roleSynonyms = []) {
+  if (!targetRole) return true;
+  const target = targetRole.toLowerCase().trim();
+  const candTitle = (candidate.currentTitle || '').toLowerCase();
+  const historyTitles = (candidate.experience || []).map(e => (e.title || '').toLowerCase());
+  const allCandTitles = [candTitle, ...historyTitles];
+
+  // Stop words that shouldn't count by themselves as a distinctive role match
+  const stopWords = new Set(['and', 'the', 'for', 'with', 'lead', 'senior', 'head', 'officer', 'manager', 'director', 'specialist', 'executive', 'associate', 'chief']);
+
+  // Extract key distinctive words (e.g. for "Chief Risk Officer" -> ["risk"])
+  const keyWords = target.split(/[\s/\\-]+/).filter(w => w.length > 2 && !stopWords.has(w));
+
+  // If there are key words, at least one MUST appear in one of candidate's titles
+  if (keyWords.length > 0) {
+    const hasKeyWordInTitle = keyWords.some(kw => allCandTitles.some(t => t.includes(kw)));
+    if (hasKeyWordInTitle) return true;
+  } else {
+    // If target has only generic words (e.g. "Manager"), check direct match
+    if (allCandTitles.some(t => t.includes(target))) return true;
+  }
+
+  // Check safe synonyms (>3 chars)
+  if (Array.isArray(roleSynonyms)) {
+    for (const syn of roleSynonyms) {
+      if (syn && syn.length > 3) {
+        const synKeyWords = syn.toLowerCase().split(/[\s/\\-]+/).filter(w => w.length > 3 && !stopWords.has(w));
+        if (synKeyWords.some(kw => allCandTitles.some(t => t.includes(kw)))) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -67,21 +109,53 @@ app.post('/api/search', async (req, res) => {
       console.warn('[Initial Query Failed]:', sqlErr.message);
     }
 
-    // If query with strict criteria yielded 0, fall back to matching the role title and location in Nigeria
-    if (candidates.length === 0 && structuredParams.cleanRoleTitle) {
-      console.log('[Notice] Retrying with core role title and target location in Nigeria...');
-      const role = structuredParams.cleanRoleTitle.toLowerCase().trim();
-      const locClause = buildLocationClause(structuredParams.targetLocation, prompt);
-      const fallbackSql = `SELECT * FROM person WHERE ${locClause} AND (job_title LIKE '%${role}%');`;
-      try {
-        candidates = await searchCandidates(fallbackSql, structuredParams, prompt);
-      } catch (fbErr) {
-        console.warn('[Fallback Query Failed]:', fbErr.message);
+    // Quality Gate: verify candidate relevance against requested role
+    let relevantCandidates = candidates.filter(candidate => 
+      isCandidateRoleRelevant(candidate, structuredParams.cleanRoleTitle, structuredParams.roleSynonyms)
+    );
+
+    if (relevantCandidates.length === 0 && candidates.length > 0) {
+      console.warn(`[Role Guardrail] Discarded candidate ${candidates[0].fullName} (${candidates[0].currentTitle}) - not relevant to requested role "${structuredParams.cleanRoleTitle}".`);
+      
+      // Fallback 1: Try strict search query in PDL without loose synonyms
+      if (structuredParams.cleanRoleTitle) {
+        const role = structuredParams.cleanRoleTitle.toLowerCase().trim();
+        const locClause = buildLocationClause(structuredParams.targetLocation, prompt);
+        const strictSql = `SELECT * FROM person WHERE ${locClause} AND (job_title LIKE '%${role}%');`;
+        try {
+          const strictRes = await searchCandidates(strictSql, structuredParams, prompt);
+          relevantCandidates = strictRes.filter(c => isCandidateRoleRelevant(c, structuredParams.cleanRoleTitle, structuredParams.roleSynonyms));
+        } catch (strictErr) {
+          console.warn('[Strict Role Retry Failed]:', strictErr.message);
+        }
+      }
+
+      // Fallback 2: Curated talent pool match if live query still produced 0 relevant
+      if (relevantCandidates.length === 0) {
+        console.log('[Notice] Using verified curated Nigerian talent pool for role:', structuredParams.cleanRoleTitle);
+        relevantCandidates = matchTalentPoolCandidates(NIGERIAN_TALENT_POOL, { prompt, structuredParams, limit: 1 });
+      }
+    } else if (relevantCandidates.length === 0 && candidates.length === 0) {
+      // If 0 candidates returned from initial query, try fallback SQL or talent pool
+      if (structuredParams.cleanRoleTitle) {
+        const role = structuredParams.cleanRoleTitle.toLowerCase().trim();
+        const locClause = buildLocationClause(structuredParams.targetLocation, prompt);
+        const fallbackSql = `SELECT * FROM person WHERE ${locClause} AND (job_title LIKE '%${role}%');`;
+        try {
+          const fbCandidates = await searchCandidates(fallbackSql, structuredParams, prompt);
+          relevantCandidates = fbCandidates.filter(c => isCandidateRoleRelevant(c, structuredParams.cleanRoleTitle, structuredParams.roleSynonyms));
+        } catch (fbErr) {
+          console.warn('[Fallback Query Failed]:', fbErr.message);
+        }
+      }
+
+      if (relevantCandidates.length === 0) {
+        relevantCandidates = matchTalentPoolCandidates(NIGERIAN_TALENT_POOL, { prompt, structuredParams, limit: 1 });
       }
     }
 
     // Step 3: Fast card evaluation (role, experience depth, criteria matches)
-    const enrichedCandidates = candidates.map(candidate => {
+    const enrichedCandidates = relevantCandidates.map(candidate => {
       const evaluations = evaluateCandidateSignals(candidate, structuredParams, criteriaList);
       const salaryBenchmark = getSalaryBenchmark(structuredParams.industry, candidate.currentTitle);
 

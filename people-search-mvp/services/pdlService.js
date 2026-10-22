@@ -431,6 +431,58 @@ export const NIGERIAN_TALENT_POOL = [
         endYear: '2014'
       }
     ]
+  },
+  {
+    id: 'whogpt_eyitayo_quadri',
+    fullName: 'Eyitayo Quadri',
+    firstName: 'Eyitayo',
+    lastName: 'Quadri',
+    currentTitle: 'Chief Risk Officer (CRO)',
+    currentCompany: 'Union Bank of Nigeria',
+    companyDomain: 'unionbankng.com',
+    location: 'Lagos State, Nigeria',
+    summary: 'Executive Risk Leader and Chief Risk Officer with over 18 years of strategic risk governance experience directing enterprise risk management, credit underwriting, market and operational risk frameworks across Nigerian commercial banks.',
+    skills: ['Enterprise Risk Management', 'Credit Risk', 'Operational Risk', 'Financial Risk', 'Regulatory Compliance', 'Risk Governance', 'Basel II/III', 'Banking'],
+    linkedinUrl: 'https://www.linkedin.com/in/eyitayo-quadri-cro',
+    githubUrl: '',
+    experience: [
+      {
+        title: 'Chief Risk Officer (CRO)',
+        company: 'Union Bank of Nigeria',
+        companyDomain: 'unionbankng.com',
+        startDate: '2020-04',
+        endDate: 'Present',
+        isCurrent: true,
+        summary: 'Directing bank-wide enterprise risk management (ERM), portfolio credit monitoring, market risk mitigation, and CBN regulatory capital adequacy compliance.'
+      },
+      {
+        title: 'Head of Enterprise Risk Management',
+        company: 'First Bank of Nigeria',
+        companyDomain: 'firstbanknigeria.com',
+        startDate: '2014-08',
+        endDate: '2020-03',
+        isCurrent: false,
+        summary: 'Oversaw credit risk policies, operational resilience frameworks, and stress testing across corporate banking divisions.'
+      },
+      {
+        title: 'Senior Credit Risk Manager',
+        company: 'Access Bank',
+        companyDomain: 'accessbankplc.com',
+        startDate: '2008-01',
+        endDate: '2014-07',
+        isCurrent: false,
+        summary: 'Managed credit approval workflows, non-performing loan (NPL) surveillance, and counterparty limits.'
+      }
+    ],
+    education: [
+      {
+        degree: 'Bachelors',
+        major: 'Banking & Finance',
+        school: 'University of Lagos',
+        startYear: '2001',
+        endYear: '2006'
+      }
+    ]
   }
 ];
 
@@ -498,6 +550,11 @@ export function matchTalentPoolCandidates(pool, { prompt = '', structuredParams 
       if (candSkills.includes('payment systems') || candText.includes('payment') || candCompanies.includes('flutterwave') || candCompanies.includes('paystack')) {
         score += 120;
       }
+    }
+
+    if (promptLower.includes('risk') || roleTitle.includes('risk')) {
+      if (candTitle.includes('risk')) score += 300;
+      if (candSkills.some(s => s.includes('risk'))) score += 100;
     }
 
     // 3. Word-by-word relevance scoring

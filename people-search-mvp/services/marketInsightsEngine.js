@@ -311,26 +311,38 @@ export function generateCriteriaMatches(candidate, searchContext = {}, criteriaL
 
   // 1. Core Role Match
   if (targetTitle) {
+    const stopWords = new Set(['and', 'the', 'for', 'with', 'lead', 'senior', 'head', 'officer', 'manager', 'director', 'specialist', 'executive', 'associate', 'chief', 'vice', 'president', 'vp']);
     const targetWords = targetTitle.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    const substantiveWords = targetWords.filter(w => !stopWords.has(w));
     const currLower = currentTitle.toLowerCase();
-    const isDirectRoleMatch = targetWords.every(w => currLower.includes(w)) || currLower.includes(targetTitle.toLowerCase());
+    const synonyms = (Array.isArray(searchContext.roleSynonyms) ? searchContext.roleSynonyms : [])
+      .map(s => (s || '').toLowerCase().trim())
+      .filter(Boolean);
 
-    const hasPastRoleMatch = history.some(h => {
+    // Direct match against targetTitle
+    const isExactRoleMatch = targetWords.every(w => currLower.includes(w)) || currLower.includes(targetTitle.toLowerCase());
+    
+    // Synonym match
+    const matchedSynonym = synonyms.find(syn => currLower.includes(syn) || (syn.length > 3 && syn.split(/\s+/).every(w => currLower.includes(w))));
+
+    // Substantive keyword match (e.g., "supply chain", "risk", "core banking")
+    const hasSubstantiveMatch = substantiveWords.length > 0 && substantiveWords.every(w => currLower.includes(w));
+
+    // Past history match
+    const pastMatch = history.find(h => {
       const t = (h.title || '').toLowerCase();
-      return targetWords.every(w => t.includes(w)) || t.includes(targetTitle.toLowerCase());
+      return targetWords.every(w => t.includes(w)) || 
+             synonyms.some(s => t.includes(s)) ||
+             (substantiveWords.length > 0 && substantiveWords.every(w => t.includes(w)));
     });
 
-    if (isDirectRoleMatch) {
+    if (isExactRoleMatch || matchedSynonym || hasSubstantiveMatch) {
       matches.push({
         status: 'green',
         badge: targetTitle,
-        text: `Currently works as ${currentTitle} at ${currentCompany}.`
+        text: `Currently works as ${currentTitle} at ${currentCompany}, directly matching the role.`
       });
-    } else if (hasPastRoleMatch) {
-      const pastMatch = history.find(h => {
-        const t = (h.title || '').toLowerCase();
-        return targetWords.every(w => t.includes(w));
-      });
+    } else if (pastMatch) {
       matches.push({
         status: 'green',
         badge: targetTitle,
@@ -340,12 +352,13 @@ export function generateCriteriaMatches(candidate, searchContext = {}, criteriaL
       // Check if related
       const isRelatedDesign = (targetTitle.toLowerCase().includes('design') && (currLower.includes('design') || currLower.includes('ux') || currLower.includes('ui')));
       const isRelatedTech = (targetTitle.toLowerCase().includes('engineer') && (currLower.includes('developer') || currLower.includes('software')));
+      const hasPartialSubstantive = substantiveWords.length > 0 && substantiveWords.some(w => currLower.includes(w));
 
-      if (isRelatedDesign || isRelatedTech) {
+      if (isRelatedDesign || isRelatedTech || hasPartialSubstantive) {
         matches.push({
           status: 'orange',
           badge: `Related: ${currentTitle}`,
-          text: `Works as ${currentTitle} at ${currentCompany}. This is related to ${targetTitle}, but not the exact same title.`
+          text: `Works as ${currentTitle} at ${currentCompany}. This is functionally related to ${targetTitle}.`
         });
       } else {
         matches.push({

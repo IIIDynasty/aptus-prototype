@@ -28,8 +28,9 @@ The platform focuses on 5 core industries in Nigeria:
 5. Telecommunications
 
 CRITICAL REQUIREMENTS FOR ROLE TITLE & SYNONYMS:
+- DO NOT generate short 2-3 letter abbreviations or acronyms (e.g., "cro", "pm", "vp", "hr", "it", "coo", "ceo", "cto", "cmo", "cfo", "swe", "qa") in roleSynonyms or mandatoryKeywords. Short acronyms cause catastrophic substring collisions in database search (e.g. 'cro' matches 'microbiology', 'pm' matches 'equipment').
+- roleSynonyms MUST ALWAYS be full, multi-word or descriptive job titles (e.g., for "Chief Risk Officer": ["head of risk", "director of risk management", "enterprise risk manager", "chief risk management officer"]; for "VP of Supply Chain": ["head of supply chain", "director of supply chain", "supply chain director"]).
 - Do NOT split compound titles into loose OR single-word keywords (e.g., "product designer" must NEVER match just "product" or just "production").
-- Generate accurate professional synonyms (e.g. for "Product Designer": ["product designer", "ui/ux designer", "ux designer", "product design lead"]).
 - Identify mandatory keywords that MUST appear in the role title (e.g. for "Product Designer", "designer" is mandatory).
 
 Return ONLY a valid JSON object matching this schema without any markdown formatting:
@@ -196,8 +197,15 @@ export function buildPdlSql(params, criteria = []) {
   const locationClause = buildLocationClause(params.targetLocation);
 
   const roleTitle = (params.cleanRoleTitle || '').toLowerCase().trim();
-  const synonyms = Array.isArray(params.roleSynonyms) ? params.roleSynonyms.map(s => s.toLowerCase().trim()).filter(Boolean) : [];
+  const rawSynonyms = Array.isArray(params.roleSynonyms) ? params.roleSynonyms.map(s => s.toLowerCase().trim()).filter(Boolean) : [];
   
+  // Filter out dangerous short acronyms (< 4 letters like cro, pm, vp, hr, it, etc.) that match arbitrary substrings
+  const safeSynonyms = rawSynonyms.filter(syn => {
+    if (!syn || syn.length <= 3) return false;
+    const badAcronyms = ['cro', 'pm', 'vp', 'hr', 'it', 'coo', 'ceo', 'cto', 'cmo', 'cfo', 'swe', 'qa', 'dev'];
+    return !badAcronyms.includes(syn);
+  });
+
   let titleConditions = [];
 
   // 1. Exact phrase match on role title
@@ -206,7 +214,7 @@ export function buildPdlSql(params, criteria = []) {
   }
 
   // 2. Add high-confidence synonyms (max 2)
-  synonyms.slice(0, 2).forEach(syn => {
+  safeSynonyms.slice(0, 2).forEach(syn => {
     if (syn !== roleTitle && !titleConditions.includes(`job_title LIKE '%${syn}%'`)) {
       titleConditions.push(`job_title LIKE '%${syn}%'`);
     }
@@ -227,7 +235,10 @@ export function buildPdlSql(params, criteria = []) {
   if (titleConditions.length > 0) {
     titleClause = ` AND (${titleConditions.join(' OR ')})`;
   } else if (params.mandatoryKeywords && params.mandatoryKeywords.length > 0) {
-    titleClause = ` AND job_title LIKE '%${params.mandatoryKeywords[0]}%'`;
+    const safeKw = params.mandatoryKeywords.filter(k => k && k.length > 3);
+    if (safeKw.length > 0) {
+      titleClause = ` AND job_title LIKE '%${safeKw[0]}%'`;
+    }
   }
 
   // 5. Industry / Sector filtering if specified in prompt or criteria
