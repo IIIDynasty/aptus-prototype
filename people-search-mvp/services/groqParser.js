@@ -1,21 +1,18 @@
-import Groq from 'groq-sdk';
-import dotenv from 'dotenv';
-dotenv.config();
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 /**
  * Parses freeform recruiter search query and optional criteria into structured search parameters using Groq
+ * Uses native fetch for seamless execution in Cloudflare Pages Functions and Node.js
  * @param {string} prompt - Recruiter's conversational description of the ideal candidate
  * @param {Array<string>} [criteria=[]] - Optional additional criteria tags selected or typed by recruiter
+ * @param {string} [customApiKey=null] - Optional Groq API Key passed from Cloudflare Pages env
  * @returns {Promise<Object>} Structured search params and PDL SQL query
  */
-export async function parseRecruiterQuery(prompt, criteria = []) {
+export async function parseRecruiterQuery(prompt, criteria = [], customApiKey = null) {
   if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
     throw new Error('Search prompt cannot be empty');
   }
 
   const cleanCriteria = Array.isArray(criteria) ? criteria.filter(c => typeof c === 'string' && c.trim().length > 0) : [];
+  const apiKey = customApiKey || (typeof process !== 'undefined' ? process.env?.GROQ_API_KEY : '');
 
   const systemInstructions = `You are the AI query parser for WhoGPT Agents, an African talent sourcing platform.
 Your task is to analyze a recruiter's natural language request and any optional criteria to extract structured parameters for discovering candidates in Nigeria.
@@ -56,16 +53,33 @@ Return ONLY a valid JSON object matching this schema without any markdown format
     (cleanCriteria.length > 0 ? `\nAdditional Criteria: ${JSON.stringify(cleanCriteria)}` : '');
 
   try {
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemInstructions },
-        { role: 'user', content: userPromptText }
-      ],
-      model: 'openai/gpt-oss-120b',
-      temperature: 0.1,
-      response_format: { type: 'json_object' }
+    if (!apiKey) {
+      console.warn('[Groq Parser Warning] No GROQ_API_KEY configured, falling back to rule parser');
+      return fallbackRuleParser(prompt, cleanCriteria);
+    }
+
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-oss-120b',
+        messages: [
+          { role: 'system', content: systemInstructions },
+          { role: 'user', content: userPromptText }
+        ],
+        temperature: 0.1,
+        response_format: { type: 'json_object' }
+      })
     });
 
+    if (!res.ok) {
+      throw new Error(`Groq API returned HTTP ${res.status}`);
+    }
+
+    const chatCompletion = await res.json();
     const parsedJson = JSON.parse(chatCompletion.choices[0].message.content);
     const sqlQuery = buildPdlSql(parsedJson, cleanCriteria);
 

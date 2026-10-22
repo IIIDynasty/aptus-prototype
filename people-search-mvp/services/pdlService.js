@@ -1,9 +1,3 @@
-import https from 'https';
-import dotenv from 'dotenv';
-dotenv.config();
-
-const API_KEY = process.env.PEOPLE_DATA_LABS_API_KEY;
-
 /**
  * Curated, verified Nigerian talent repository across top modern industries & tech domains.
  * Provides authentic, high-quality candidate data when live network is unavailable or filtered.
@@ -581,88 +575,52 @@ export function matchTalentPoolCandidates(pool, { prompt = '', structuredParams 
  * @param {string} prompt - Original recruiter prompt
  * @returns {Promise<Array>} List of normalized candidate profile objects
  */
-export async function searchCandidates(sqlQuery, structuredParams = {}, prompt = '') {
+export async function searchCandidates(sqlQuery, structuredParams = {}, prompt = '', customApiKey = null) {
+  const apiKey = customApiKey || (typeof process !== 'undefined' ? process.env?.PEOPLE_DATA_LABS_API_KEY : '');
+
   const fallbackMatch = () => {
     console.log(`[Talent Pool Dispatch]: Selecting top corresponding candidate for query: "${prompt || structuredParams.cleanRoleTitle}"`);
     return matchTalentPoolCandidates(NIGERIAN_TALENT_POOL, { prompt, structuredParams, sqlQuery, limit: 1 });
   };
 
-  if (!API_KEY) {
+  if (!apiKey) {
     console.warn('[Notice]: PEOPLE_DATA_LABS_API_KEY is not configured, serving talent pool');
     return fallbackMatch();
   }
 
-  return new Promise((resolve) => {
-    let resolved = false;
-
-    const safeResolve = (data) => {
-      if (!resolved) {
-        resolved = true;
-        resolve(data);
-      }
-    };
-
-    const requestBody = JSON.stringify({
-      sql: sqlQuery,
-      size: 1 // Testing Credit Guardrail: Exactly 1 candidate per search
-    });
-
-    const options = {
-      hostname: 'api.peopledatalabs.com',
-      port: 443,
-      path: '/v5/person/search',
-      method: 'POST',
-      family: 4, // Critical for Windows: prevents IPv6 connection timeout
-      headers: {
-        'X-Api-Key': API_KEY,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(requestBody)
-      },
-      timeout: 15000
-    };
-
+  try {
     console.log(`[Executing Live PDL Query]: ${sqlQuery}`);
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          console.log(`[PDL API Status]: ${res.statusCode}, Total Matches in Nigeria: ${parsed.total || 0}`);
-
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            if (!parsed.data || parsed.data.length === 0) {
-              console.log('[Notice] No direct matches from PDL query, falling back to role-matched talent pool.');
-              return safeResolve(fallbackMatch());
-            }
-            const normalized = parsed.data.slice(0, 1).map(profile => normalizeProfile(profile, structuredParams));
-            console.log(`[PDL Returned Real Candidate]: ${normalized[0].fullName} | ${normalized[0].currentTitle} @ ${normalized[0].currentCompany} (${normalized[0].location})`);
-            return safeResolve(normalized);
-          }
-
-          console.warn('[PDL API Non-200 Response]:', res.statusCode);
-          safeResolve(fallbackMatch());
-        } catch (e) {
-          console.warn('[PDL Parse Error, using talent pool]:', e.message);
-          safeResolve(fallbackMatch());
-        }
-      });
+    const res = await fetch('https://api.peopledatalabs.com/v5/person/search', {
+      method: 'POST',
+      headers: {
+        'X-Api-Key': apiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        sql: sqlQuery,
+        size: 1 // Testing Credit Guardrail: Exactly 1 candidate per search
+      })
     });
 
-    req.on('timeout', () => {
-      console.warn('[PDL Network Timeout after 15s, using talent pool]');
-      req.destroy();
-      safeResolve(fallbackMatch());
-    });
+    if (res.ok) {
+      const parsed = await res.json();
+      console.log(`[PDL API Status]: ${res.status}, Total Matches in Nigeria: ${parsed.total || 0}`);
 
-    req.on('error', (err) => {
-      console.warn('[PDL Network Error, using talent pool]:', err.message);
-      safeResolve(fallbackMatch());
-    });
+      if (!parsed.data || parsed.data.length === 0) {
+        console.log('[Notice] No direct matches from PDL query, falling back to role-matched talent pool.');
+        return fallbackMatch();
+      }
+      const normalized = parsed.data.slice(0, 1).map(profile => normalizeProfile(profile, structuredParams));
+      console.log(`[PDL Returned Real Candidate]: ${normalized[0].fullName} | ${normalized[0].currentTitle} @ ${normalized[0].currentCompany} (${normalized[0].location})`);
+      return normalized;
+    }
 
-    req.write(requestBody);
-    req.end();
-  });
+    console.warn('[PDL API Non-200 Response]:', res.status);
+    return fallbackMatch();
+  } catch (err) {
+    console.warn('[PDL Fetch Error, using talent pool]:', err.message);
+    return fallbackMatch();
+  }
 }
 
 function capitalizeWords(str) {

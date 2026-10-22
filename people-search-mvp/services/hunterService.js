@@ -1,21 +1,19 @@
-import https from 'https';
-import dotenv from 'dotenv';
-dotenv.config();
-
-const HUNTER_API_KEY = process.env.HUNTER_API_KEY;
-
 /**
  * Discovers candidate email using Hunter.io Email Finder API
  * Only triggered on explicit recruiter request to preserve monthly credits.
+ * Compatible with Cloudflare Workers/Pages Functions and Node.js
  * @param {string} firstName - Candidate's first name
  * @param {string} lastName - Candidate's last name
  * @param {string} domain - Candidate's company domain (e.g. interswitchgroup.com)
  * @param {string} companyName - Company name fallback
+ * @param {string} [customApiKey=null] - Optional Hunter API key from env
  * @returns {Promise<Object>} Found email details and verification confidence
  */
-export async function findCandidateEmail({ firstName, lastName, domain, companyName }) {
-  if (!HUNTER_API_KEY) {
-    throw new Error('HUNTER_API_KEY is not configured in .env');
+export async function findCandidateEmail({ firstName, lastName, domain, companyName }, customApiKey = null) {
+  const apiKey = customApiKey || (typeof process !== 'undefined' ? process.env?.HUNTER_API_KEY : '');
+
+  if (!apiKey) {
+    throw new Error('HUNTER_API_KEY is not configured');
   }
 
   if (!firstName || !lastName) {
@@ -40,7 +38,7 @@ export async function findCandidateEmail({ firstName, lastName, domain, companyN
   const queryParams = new URLSearchParams({
     first_name: firstName.trim(),
     last_name: lastName.trim(),
-    api_key: HUNTER_API_KEY
+    api_key: apiKey
   });
 
   if (cleanDomain && cleanDomain !== 'company.com') {
@@ -51,54 +49,47 @@ export async function findCandidateEmail({ firstName, lastName, domain, companyN
 
   const url = `https://api.hunter.io/v2/email-finder?${queryParams.toString()}`;
 
-  return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          console.log(`[Hunter.io Status]: ${res.statusCode} for ${firstName} ${lastName} @ ${cleanDomain}`);
+  try {
+    const res = await fetch(url);
+    const parsed = await res.json();
+    console.log(`[Hunter.io Status]: ${res.status} for ${firstName} ${lastName} @ ${cleanDomain}`);
 
-          if (res.statusCode === 200 && parsed.data && parsed.data.email) {
-            return resolve({
-              status: 'found',
-              email: parsed.data.email,
-              score: parsed.data.score || 85,
-              verificationStatus: parsed.data.verification?.status || 'deliverable',
-              domain: cleanDomain,
-              sourcesCount: (parsed.data.sources || []).length
-            });
-          }
+    if (res.status === 200 && parsed.data && parsed.data.email) {
+      return {
+        status: 'found',
+        email: parsed.data.email,
+        score: parsed.data.score || 85,
+        verificationStatus: parsed.data.verification?.status || 'deliverable',
+        domain: cleanDomain,
+        sourcesCount: (parsed.data.sources || []).length
+      };
+    }
 
-          if (res.statusCode === 404 || (parsed.data && !parsed.data.email)) {
-            return resolve({
-              status: 'not_found',
-              email: null,
-              message: `No public email address found on ${cleanDomain || 'company domain'}.`,
-              domain: cleanDomain
-            });
-          }
+    if (res.status === 404 || (parsed.data && !parsed.data.email)) {
+      return {
+        status: 'not_found',
+        email: null,
+        message: `No public email address found on ${cleanDomain || 'company domain'}.`,
+        domain: cleanDomain
+      };
+    }
 
-          if (parsed.errors && parsed.errors.length > 0) {
-            return resolve({
-              status: 'error',
-              email: null,
-              message: parsed.errors[0].details || 'Contact lookup unavailable.',
-              domain: cleanDomain
-            });
-          }
+    if (parsed.errors && parsed.errors.length > 0) {
+      return {
+        status: 'error',
+        email: null,
+        message: parsed.errors[0].details || 'Contact lookup unavailable.',
+        domain: cleanDomain
+      };
+    }
 
-          resolve({
-            status: 'not_found',
-            email: null,
-            message: 'Unable to retrieve contact details at this time.',
-            domain: cleanDomain
-          });
-        } catch (e) {
-          reject(new Error(`Failed to parse Hunter.io response: ${e.message}`));
-        }
-      });
-    }).on('error', (err) => reject(err));
-  });
+    return {
+      status: 'not_found',
+      email: null,
+      message: 'Unable to retrieve contact details at this time.',
+      domain: cleanDomain
+    };
+  } catch (e) {
+    throw new Error(`Failed to parse Hunter.io response: ${e.message}`);
+  }
 }
