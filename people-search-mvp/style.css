@@ -3158,8 +3158,8 @@ body.render-dark-theme {
   color: #FFFFFF;
   position: relative;
   z-index: 1;
-  padding-top: 2.25rem !important;
-  padding-bottom: 2.5rem !important;
+  padding-top: 3.5rem !important;
+  padding-bottom: 4.5rem !important;
   border-bottom: none !important;
 }
 
