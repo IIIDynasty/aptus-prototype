@@ -7,7 +7,7 @@
   <title>Aptus — AI-Powered Recruitment Platform</title>
   <meta name="description"
     content="Aptus helps organisations identify qualified candidates faster using AI-assisted matching, smarter sourcing through professional communities, and guided candidate applications." />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 
 <body>
@@ -638,7 +638,7 @@
         </div>
 
         <!-- Create Job View -->
-        <div id="view-create" class="hidden animate-in">
+        <div id="view-create" class="hidden">
           <div class="page-header">
             <div class="page-title-group">
               <h2>Post a New Job</h2>
@@ -669,7 +669,7 @@
               </div>
               <div class="card-body">
                 <!-- Hausa Toggle Demo (Moved to top for visibility) -->
-                <div class="form-group"
+                <div class="form-group" id="hausaJobToggleContainer"
                   style="margin-bottom:20px; padding:12px; background:var(--bg-light); border-radius:var(--radius); border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
                   <div>
                     <label class="form-label" style="margin-bottom:2px;">Enable Hausa Translation (Powered by AI) <span
@@ -690,19 +690,39 @@
                   </label>
                 </div>
 
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label class="form-label">Job Title <span class="required">*</span></label>
-                    <input class="form-input" id="jobTitle" type="text" placeholder="e.g. Senior Software Engineer" />
+                <!-- External Applications collected toggle -->
+                <div class="form-group" id="externalCollectedToggleContainer"
+                  style="margin-bottom:20px; padding:12px; background:var(--bg-light); border-radius:var(--radius); border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+                  <div>
+                    <label class="form-label" style="margin-bottom:2px;">Applications already collected outside Aptus</label>
+                    <div class="form-hint" style="font-size:11px;">Skip community distribution and import candidates directly from a CSV or Excel spreadsheet.</div>
                   </div>
-                  <div class="form-group">
+                  <label style="position:relative; display:inline-block; width:44px; height:24px;">
+                    <input type="checkbox" style="opacity:0; width:0; height:0;" id="externalCollectedToggle">
+                    <span
+                      style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.4s; border-radius:34px;"
+                      onmouseover="this.style.backgroundColor='#bbb'"
+                      onmouseout="this.style.backgroundColor=document.getElementById('externalCollectedToggle').checked ? 'var(--primary-blue)' : '#ccc'"
+                      onclick="const cb=document.getElementById('externalCollectedToggle'); cb.checked=!cb.checked; this.style.backgroundColor=cb.checked ? 'var(--primary-blue)' : '#ccc'; this.children[0].style.transform=cb.checked ? 'translateX(20px)' : 'translateX(0)'; toggleExternalCollectedMode(cb.checked); return false;">
+                      <span
+                        style="position:absolute; content:''; height:18px; width:18px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%;"></span>
+                    </span>
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Job Title <span class="required">*</span></label>
+                  <input class="form-input" id="jobTitle" type="text" placeholder="e.g. Senior Software Engineer" />
+                </div>
+
+                <div id="extendedJobFields">
+                  <div class="form-group" style="margin-bottom: 20px;">
                     <label class="form-label">Department</label>
                     <input class="form-input" id="jobDept" type="text" placeholder="e.g. Engineering" />
                   </div>
-                </div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label class="form-label">Location (State) <span class="required">*</span></label>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="form-label">Location (State) <span class="required">*</span></label>
                     <div class="location-autocomplete" id="locationWrapper">
                       <input class="form-input" id="jobLocation" type="text"
                         placeholder="Type to search Northern Nigerian states…" autocomplete="off"
@@ -785,10 +805,11 @@
                   </div>
                   <div id="customQuestionsContainer"></div>
                 </div>
+              </div> <!-- End #extendedJobFields -->
 
                 <div style="display:flex; justify-content:flex-end; margin-top:16px;">
-                  <button class="btn btn-primary" onclick="nextCreateStep(1)">
-                    Continue to Distribution
+                  <button class="btn btn-primary" onclick="nextCreateStep(1)" id="btnCreateJobNext">
+                    <span id="btnCreateJobNextText">Continue to Distribution</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                       stroke-linejoin="round">
                       <path d="M5 12h14M12 5l7 7-7 7" />
@@ -906,7 +927,7 @@
         </div>
 
         <!-- Candidate Rankings View -->
-        <div id="view-rankings" class="hidden animate-in">
+        <div id="view-rankings" class="hidden">
           <div class="page-header">
             <div class="page-title-group">
               <h2>Candidate Rankings</h2>
@@ -918,6 +939,9 @@
                 <option value="">Loading jobs…</option>
               </select>
               <div class="rankings-action-buttons">
+                <button class="btn btn-outline btn-sm" onclick="openImportModal()" id="btn-import-apps" style="display:flex; align-items:center; gap:6px;">
+                  📥 Import Applications
+                </button>
                 <button class="btn btn-outline btn-sm" onclick="manualRefreshRankings()">
                   🔄 Refresh
                 </button>
@@ -963,7 +987,7 @@
                   </div>
                 </div>
               </div>
-              <div style="overflow-x:auto;">
+              <div id="rankingTableContainer" style="overflow-x:auto;">
                 <table class="ranking-table">
                   <thead>
                     <tr>
@@ -983,6 +1007,16 @@
                   </thead>
                   <tbody id="rankingTableBody"></tbody>
                 </table>
+              </div>
+
+              <!-- Empty State when no candidates yet -->
+              <div id="rankingsEmptyState" style="display:none; padding:64px 32px; text-align:center;">
+                <div style="width:72px;height:72px;background:linear-gradient(135deg,#e8f0fe,#c7d7fc);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;">📥</div>
+                <h3 style="font-size:20px;font-weight:700;color:var(--charcoal);margin-bottom:8px;">No applications imported yet</h3>
+                <p style="color:var(--text-mid);font-size:14px;max-width:360px;margin:0 auto 28px;line-height:1.6;">Bring your existing applications into Aptus from a CSV or Excel file exported from Google Forms or any other form tool.</p>
+                <button class="btn btn-primary" onclick="openImportModal()" style="gap:8px;">
+                  📥 Import Applications
+                </button>
               </div>
             </div>
 
@@ -1030,9 +1064,25 @@
                   </div>
 
                   <div class="split-section">
-                    <h4>Experience & Skills</h4>
+                    <h4>Contact &amp; Details</h4>
+                    <div style="display:flex; flex-direction:column; gap:6px; font-size:14px;">
+                      <div><span style="color:var(--text-mid); font-size:12px;">Phone</span><br><span id="splitPhone">-</span></div>
+                      <div><span style="color:var(--text-mid); font-size:12px;">Location</span><br><span id="splitLocation">-</span></div>
+                      <div><span style="color:var(--text-mid); font-size:12px;">Education</span><br><span id="splitEducation">-</span></div>
+                      <div id="splitLinkedInRow"><span style="color:var(--text-mid); font-size:12px;">LinkedIn</span><br><a id="splitLinkedIn" href="#" target="_blank" style="color:var(--primary-blue); word-break:break-all;">-</a></div>
+                    </div>
+                  </div>
+
+                  <div class="split-section">
+                    <h4>Experience &amp; Skills</h4>
                     <p id="splitExperience" style="font-size:14px; margin-bottom:8px;"></p>
                     <div id="splitSkills" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                  </div>
+
+                  <!-- Custom Form Responses -->
+                  <div class="split-section" id="splitCustomFieldsSection" style="display:none;">
+                    <h4>Custom Form Responses</h4>
+                    <div id="splitCustomFields" style="display:flex; flex-direction:column; gap:10px;"></div>
                   </div>
 
                   <!-- Team Collaboration Notes -->
@@ -1056,6 +1106,13 @@
               <div class="split-right-panel">
                 <div class="cv-viewer-container" id="cvViewerContainer">
                   <iframe id="cvEmbed" src="" width="100%" height="100%" style="border:none;"></iframe>
+                  <!-- External CV link banner (for imported CVs that are web URLs) -->
+                  <div id="cvExternalLinkBanner" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg,#f8faff,#eef2ff); padding:32px; text-align:center;">
+                    <div style="font-size:48px; margin-bottom:16px;">🔗</div>
+                    <h4 style="font-size:16px; font-weight:700; color:var(--charcoal); margin-bottom:8px;">CV stored as external link</h4>
+                    <p style="font-size:13px; color:var(--text-mid); margin-bottom:20px; max-width:260px;">This candidate's CV was imported from an external source (e.g. Google Drive). Click below to open it in a new tab.</p>
+                    <a id="cvExternalLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Open CV ↗</a>
+                  </div>
                   <div id="cvLoadingState"
                     style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
                     <div class="spinner"></div>
@@ -1068,43 +1125,43 @@
 
         </div>
 
-    <!-- Communities View -->
-    <div id="view-communities" class="hidden animate-in">
-      <div class="page-header">
-        <div class="page-title-group">
-          <h2>Partner Communities</h2>
-          <p>Professional networks where Aptus distributes your job postings</p>
+        <!-- Communities View -->
+        <div id="view-communities" class="hidden">
+          <div class="page-header">
+            <div class="page-title-group">
+              <h2>Partner Communities</h2>
+              <p>Professional networks where Aptus distributes your job postings</p>
+            </div>
+          </div>
+          <div class="page-body">
+            <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+              <div class="stat-card">
+                <div class="stat-label">Network Partners</div>
+                <div class="stat-value gold">24</div>
+                <div class="stat-sub">Active communities</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Total Reach</div>
+                <div class="stat-value">340K+</div>
+                <div class="stat-sub">Professionals</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Avg. Application Rate</div>
+                <div class="stat-value gold">8.4%</div>
+                <div class="stat-sub">vs 2.1% job boards</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">All Partner Communities</span></div>
+              <div class="card-body">
+                <div class="community-grid" id="allCommunitiesGrid"></div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="page-body">
-        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
-          <div class="stat-card">
-            <div class="stat-label">Network Partners</div>
-            <div class="stat-value gold">24</div>
-            <div class="stat-sub">Active communities</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Reach</div>
-            <div class="stat-value">340K+</div>
-            <div class="stat-sub">Professionals</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Avg. Application Rate</div>
-            <div class="stat-value gold">8.4%</div>
-            <div class="stat-sub">vs 2.1% job boards</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">All Partner Communities</span></div>
-          <div class="card-body">
-            <div class="community-grid" id="allCommunitiesGrid"></div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    </main>
-  </div>
+      </main>
+    </div>
   </div>
 
   <!-- ============================================
@@ -1848,6 +1905,60 @@
   </div>
 
   <!-- ============================================
+     IMPORT APPLICATIONS MODAL
+     ============================================ -->
+  <div id="importModal" class="modal-overlay hidden">
+    <div class="modal" style="max-width:640px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+      <div class="modal-header">
+        <h3 id="importModalTitle">📥 Import Applications</h3>
+        <button class="modal-close" onclick="closeModal('importModal')">×</button>
+      </div>
+
+      <!-- Step 1: Choose Format & Upload -->
+      <div id="importStep1" class="modal-body" style="overflow-y:auto;">
+        <p style="color:var(--text-mid); font-size:14px; margin-bottom:20px;">Upload your exported Google Forms CSV or Excel spreadsheet and Aptus will automatically read and map all candidate data.</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+          <div id="formatCardCSV" onclick="selectImportFormat('csv')" style="border:2px solid var(--border); border-radius:12px; padding:20px; text-align:center; cursor:pointer; transition:all 0.2s;">
+            <div style="font-size:32px; margin-bottom:8px;">📄</div>
+            <div style="font-weight:700; font-size:15px; color:var(--charcoal);">CSV</div>
+            <div style="font-size:12px; color:var(--text-mid); margin-top:4px;">.csv files</div>
+          </div>
+          <div id="formatCardXLSX" onclick="selectImportFormat('xlsx')" style="border:2px solid var(--border); border-radius:12px; padding:20px; text-align:center; cursor:pointer; transition:all 0.2s;">
+            <div style="font-size:32px; margin-bottom:8px;">📊</div>
+            <div style="font-weight:700; font-size:15px; color:var(--charcoal);">Excel</div>
+            <div style="font-size:12px; color:var(--text-mid); margin-top:4px;">.xlsx / .xls files</div>
+          </div>
+        </div>
+        <div id="importDropzone" style="border:2px dashed var(--border); border-radius:12px; padding:48px 24px; text-align:center; transition:all 0.2s; display:none; cursor:pointer;" onclick="document.getElementById('importFileInput').click()" ondragover="event.preventDefault(); this.style.borderColor='var(--primary-blue)'; this.style.background='#f0f5ff';" ondragleave="this.style.borderColor='var(--border)'; this.style.background='';" ondrop="event.preventDefault(); this.style.borderColor='var(--border)'; this.style.background=''; handleImportDrop(event);">
+          <div style="font-size:36px; margin-bottom:10px;" id="importDropzoneIcon">📂</div>
+          <p style="font-weight:600; color:var(--charcoal); margin-bottom:4px;" id="importDropzoneText">Drag &amp; drop your file here</p>
+          <p style="font-size:13px; color:var(--text-mid);" id="importDropzoneHint">or click to browse</p>
+          <input type="file" id="importFileInput" style="display:none;" onchange="handleImportFileSelected(event)" />
+        </div>
+      </div>
+
+      <!-- Step 2: Field Mapping -->
+      <div id="importStep2" class="modal-body" style="display:none; overflow-y:auto;">
+        <p style="color:var(--text-mid); font-size:14px; margin-bottom:4px;">Aptus has read your file and detected the following columns. Review and confirm the mapping for each field:</p>
+        <div id="importMappingRows" style="margin-top:16px; display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+
+      <!-- Step 3: Import Preview -->
+      <div id="importStep3" class="modal-body" style="display:none; overflow-y:auto;">
+        <div id="importPreviewContent"></div>
+      </div>
+
+      <div class="modal-footer" style="flex-shrink:0;">
+        <button class="btn btn-outline btn-sm" id="importBtnBack" onclick="importGoBack()" style="display:none;">← Back</button>
+        <div style="flex:1;"></div>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('importModal')">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="importBtnNext" onclick="importGoNext()" style="display:none;">Next →</button>
+        <button class="btn btn-primary btn-sm" id="importBtnConfirm" onclick="finalizeImport()" style="display:none;">📥 Import All Candidates</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
      AI PROCESSING OVERLAY
      ============================================ -->
   <div id="processingOverlay" class="processing-overlay hidden">
@@ -1870,13 +1981,17 @@
   <!-- NOTE: Firebase SDK removed — app runs on Azure Cosmos DB via Express. -->
   <!-- Firebase CDN scripts were causing JS errors that blocked page interactivity. -->
 
+  <!-- SheetJS for Excel parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <!-- SignalR Client -->
   <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
 
   <!-- Application Logic -->
-  <script src="api-client.js"></script>
-  <script src="signalr-client.js"></script>
-  <script src="app.js"></script>
+  <script src="api-client.js?v=2"></script>
+  <script src="signalr-client.js?v=2"></script>
+  <script src="app.js?v=2"></script>
+  <script src="importer.js?v=2"></script>
 
   <script>
     // NOTE: Firebase is legacy — app runs on Azure Cosmos DB via Express server.

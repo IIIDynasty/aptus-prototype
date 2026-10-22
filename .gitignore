@@ -44,6 +44,7 @@ build/
 
 # Testing
 coverage/
+pdl_test/
 
 # Temporary files
 *.tmp

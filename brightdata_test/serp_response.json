@@ -1,0 +1,12 @@
+{
+  "status_code": 502,
+  "headers": {
+    "x-brd-serp-warn": "these query parameters have unacceptable name and/or value and were removed: num",
+    "x-brd-error": "redirect location was rejected",
+    "x-brd-error-code": "captcha",
+    "date": "Sun, 13 Sep 2026 13:35:51 GMT",
+    "connection": "close",
+    "transfer-encoding": "chunked"
+  },
+  "body": ""
+}

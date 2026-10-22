@@ -173,6 +173,81 @@ app.post('/api/candidates', async (req, res) => {
   }
 });
 
+// Import candidates endpoint
+app.post('/api/jobs/:jobId/candidates/import', async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const { candidates } = req.body;
+    
+    if (!candidates || !Array.isArray(candidates)) {
+      return res.status(400).json({ error: 'candidates must be an array' });
+    }
+    
+    // Check if job exists
+    const job = await jobManager.getJobPosting(jobId);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+    
+    const container = azureConfig.getContainer('candidates');
+    const importedCandidates = [];
+    const validators = require('./utils/validators');
+    
+    for (const cData of candidates) {
+      const candidateId = validators.generateCandidateId();
+      
+      const candidateDoc = {
+        id: candidateId,
+        jobId: jobId,
+        fullName: cData.fullName || 'Unknown Candidate',
+        email: cData.email || '',
+        phone: cData.phone || null,
+        linkedIn: cData.linkedIn || null,
+        yearsOfExperience: typeof cData.yearsOfExperience === 'number' ? cData.yearsOfExperience : 0,
+        currentRole: cData.currentRole || null,
+        skills: Array.isArray(cData.skills) ? cData.skills : [],
+        achievements: cData.achievements || '',
+        qualifications: cData.qualifications || null,
+        cvUrl: cData.cvUrl || null,
+        cvExtension: cData.cvUrl ? (cData.cvUrl.endsWith('.docx') ? 'docx' : 'pdf') : null,
+        coverLetterUrl: cData.coverLetterUrl || null,
+        coverLetterExtension: null,
+        scores: {
+          skills: null,
+          experience: null,
+          qualifications: null,
+          quality: null,
+          total: null
+        },
+        status: 'pending',
+        statusHistory: [
+          {
+            status: 'pending',
+            timestamp: new Date().toISOString(),
+            note: 'Imported from external spreadsheet'
+          }
+        ],
+        source: 'imported',
+        isRead: false,
+        internalNotes: [],
+        customFields: cData.customFields || {}
+      };
+      
+      const { resource: createdCandidate } = await container.items.create(candidateDoc);
+      importedCandidates.push(createdCandidate);
+      
+      // Increment applicant count
+      await jobManager.incrementApplicantCount(jobId);
+    }
+    
+    console.log(`✅ Bulk imported ${importedCandidates.length} candidate(s) for job ${jobId}`);
+    res.json({ success: true, count: importedCandidates.length });
+  } catch (error) {
+    console.error('❌ Failed to import candidates:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/jobs/:jobId/candidates/bulk-score', async (req, res) => {
   try {
     const { jobId } = req.params;
@@ -452,6 +527,92 @@ app.post('/api/emails/notify-community', async (req, res) => {
     res.json({ success: true, message: `Notification sent for community: ${communityName}` });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// People Search MVP Route (PDL Integration)
+// ============================================
+app.post('/api/people-search', async (req, res) => {
+  try {
+    const { role, location, minExperience, maxExperience } = req.body;
+    
+    // Construct PDL SQL Query
+    // We enforce Nigeria and try to match the location/role
+    let sqlParts = ["location_country = 'nigeria'"];
+    
+    if (location) {
+      const cleanLoc = location.replace(/[^a-zA-Z0-9\s]/g, '').toLowerCase().trim();
+      if (cleanLoc && cleanLoc !== 'nigeria') {
+        sqlParts.push(`location_name LIKE '%${cleanLoc}%'`);
+      }
+    }
+    
+    if (role) {
+      const cleanRole = role.replace(/[^a-zA-Z0-9\s]/g, '').toLowerCase().trim();
+      const keywords = cleanRole.split(' ').filter(w => w.length > 2);
+      if (keywords.length > 0) {
+        const roleClauses = keywords.map(kw => `job_title LIKE '%${kw}%'`);
+        sqlParts.push(`(${roleClauses.join(' OR ')})`);
+      }
+    }
+    
+    if (minExperience > 0) {
+      sqlParts.push(`inferred_years_experience >= ${minExperience}`);
+    }
+    
+    if (maxExperience) {
+       sqlParts.push(`inferred_years_experience <= ${maxExperience}`);
+    }
+    
+    // Clean up extra spaces and add the required SELECT clause for PDL
+    const whereClause = sqlParts.join(' AND ').trim().replace(/\s+/g, ' ');
+    const sqlQuery = `SELECT * FROM person WHERE ${whereClause}`;
+    console.log('[PDL Search MVP] Executing SQL:', sqlQuery);
+
+    const postData = JSON.stringify({
+      sql: sqlQuery,
+      size: 3 // HARD LIMIT: Save credits (only 3 results)
+    });
+
+    const https = require('https');
+    const options = {
+      hostname: 'api.peopledatalabs.com',
+      port: 443,
+      path: '/v5/person/search',
+      method: 'POST',
+      headers: {
+        'X-Api-Key': process.env.PEOPLE_DATA_LABS_API_KEY,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const pdlRequest = new Promise((resolve, reject) => {
+      const apiReq = https.request(options, (apiRes) => {
+        let responseBody = '';
+        apiRes.on('data', (chunk) => responseBody += chunk);
+        apiRes.on('end', () => {
+          try {
+            const parsed = JSON.parse(responseBody);
+            if (apiRes.statusCode >= 200 && apiRes.statusCode < 300) resolve(parsed);
+            else reject({ statusCode: apiRes.statusCode, error: parsed });
+          } catch (e) {
+            reject({ statusCode: apiRes.statusCode, error: responseBody });
+          }
+        });
+      });
+      apiReq.on('error', reject);
+      apiReq.write(postData);
+      apiReq.end();
+    });
+
+    const result = await pdlRequest;
+    res.json({ success: true, data: result.data || [], total: result.total });
+
+  } catch (error) {
+    console.error('[PDL API Error]', error);
+    res.status(error.statusCode || 500).json({ error: error.error || error.message });
   }
 });
 

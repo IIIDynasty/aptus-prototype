@@ -209,8 +209,9 @@ async function recruiterNav(view) {
   const el = document.getElementById(`view-${view}`);
   if (el) {
     el.classList.remove('hidden');
-    el.classList.add('animate-in');
-    // Scroll to top on mobile navigation
+    el.classList.remove('animate-in'); // Remove first to reset animation state
+    void el.offsetWidth;              // Force reflow so display:block is committed
+    el.classList.add('animate-in');   // Re-add to start animation fresh
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -227,6 +228,7 @@ async function recruiterNav(view) {
     await populateJobFilterDropdown();
     const jobId = window.currentJobId || document.getElementById('rankingJobFilter')?.value;
     if (jobId) {
+      window.currentJobId = jobId;
       await renderRankings(jobId);
     }
   }
@@ -254,7 +256,9 @@ async function candidateNav(view) {
   const el = document.getElementById(`cview-${view}`);
   if (el) {
     el.classList.remove('hidden');
-    el.classList.add('animate-in');
+    el.classList.remove('animate-in'); // Remove first to reset animation state
+    void el.offsetWidth;              // Force reflow so display:block is committed
+    el.classList.add('animate-in');   // Re-add to start animation fresh
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -600,9 +604,82 @@ function setStepProgress(step) {
   }
 }
 
+function toggleExternalCollectedMode(checked) {
+  const extendedFields = document.getElementById('extendedJobFields');
+  const hausaContainer = document.getElementById('hausaJobToggleContainer');
+  const nextBtnText = document.getElementById('btnCreateJobNextText');
+  
+  if (checked) {
+    if (extendedFields) extendedFields.style.display = 'none';
+    if (hausaContainer) hausaContainer.style.display = 'none';
+    if (nextBtnText) nextBtnText.textContent = 'Create & Go to Rankings';
+  } else {
+    if (extendedFields) extendedFields.style.display = 'block';
+    if (hausaContainer) hausaContainer.style.display = 'flex';
+    if (nextBtnText) nextBtnText.textContent = 'Continue to Distribution';
+  }
+}
+
 function nextCreateStep(from) {
   if (from === 1) {
     const title = document.getElementById('jobTitle').value.trim();
+    const isExternalCollected = document.getElementById('externalCollectedToggle')?.checked || false;
+
+    if (isExternalCollected) {
+      if (!title) {
+        showToast('Please enter a job title', 'danger', '⚠️');
+        return;
+      }
+      if (title.length < 5) {
+        showToast('Job title must be at least 5 characters', 'danger', '⚠️');
+        return;
+      }
+      if (title.length > 100) {
+        showToast('Job title must be less than 100 characters', 'danger', '⚠️');
+        return;
+      }
+      
+      const jobData = {
+        title: title,
+        department: 'General',
+        location: 'Remote',
+        experienceLevel: 'Entry Level (0–2 years)',
+        description: 'Applications imported from external source (Google Forms/Spreadsheet).',
+        responsibilities: ['Imported job posting'],
+        skills: ['Imported'],
+        qualifications: [],
+        perks: [],
+        niceToHave: [],
+        selectedChannels: [],
+        hausaEnabled: false
+      };
+
+      showProcessing('Creating job for import…', 'Setting up your candidate dashboard');
+      
+      createJob(jobData)
+        .then(result => {
+          hideProcessing();
+          showToast('Job created successfully!', 'success', '✅');
+          
+          // Reset form fields
+          resetCreateForm();
+          
+          // Refresh dashboard
+          loadDashboardJobs();
+          
+          // Direct navigation to rankings for this job
+          window.currentJobId = result.job.id;
+          window.currentJobAiTier = result.job.aiTier || 'paid';
+          recruiterNav('rankings');
+        })
+        .catch(error => {
+          hideProcessing();
+          showToast(error.message || 'Failed to create job', 'danger', '❌');
+        });
+        
+      return;
+    }
+
     const location = document.getElementById('jobLocation').value.trim();
     const level = document.getElementById('jobLevel').value;
     const desc = document.getElementById('jobDesc').value.trim();
@@ -1026,6 +1103,17 @@ async function renderRankings(jobId, enableAutoRefresh = true) {
     document.getElementById('shortlistCount').textContent = `${shortlistedCount} Shortlisted`;
     document.getElementById('totalCount').textContent = `${sorted.length} Total`;
     
+    // Toggle empty state vs table based on candidate count
+    const tableContainer = document.getElementById('rankingTableContainer');
+    const emptyState = document.getElementById('rankingsEmptyState');
+    if (sorted.length === 0) {
+      if (tableContainer) tableContainer.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'block';
+    } else {
+      if (tableContainer) tableContainer.style.display = '';
+      if (emptyState) emptyState.style.display = 'none';
+    }
+    
     // Reset filter label to "All" when rankings refresh
     const labelEl = document.getElementById('selected-status-label');
     if (labelEl) labelEl.textContent = 'All';
@@ -1269,7 +1357,20 @@ async function openCandidateSplitScreen(candidateId, jobId) {
     document.getElementById('splitCandidateName').textContent = c.fullName || 'Unknown Candidate';
     document.getElementById('splitCandidateEmail').textContent = c.email || '-';
     document.getElementById('splitStatusDropdown').value = c.status || 'pending';
-    document.getElementById('splitExperience').textContent = c.yearsOfExperience ? `${c.yearsOfExperience} years, ${c.currentRole || ''}` : '-';
+    document.getElementById('splitExperience').textContent = c.yearsOfExperience ? `${c.yearsOfExperience} years${c.currentRole ? ', ' + c.currentRole : ''}` : '-';
+    
+    // Contact & Details
+    document.getElementById('splitPhone').textContent = c.phone || '-';
+    document.getElementById('splitLocation').textContent = c.customFields?.location || '-';
+    document.getElementById('splitEducation').textContent = c.qualifications || c.customFields?.education || '-';
+    const linkedInEl = document.getElementById('splitLinkedIn');
+    if (c.linkedIn) {
+      linkedInEl.href = c.linkedIn.startsWith('http') ? c.linkedIn : `https://${c.linkedIn}`;
+      linkedInEl.textContent = c.linkedIn;
+    } else {
+      linkedInEl.href = '#';
+      linkedInEl.textContent = '-';
+    }
     
     // Skills
     const skillsContainer = document.getElementById('splitSkills');
@@ -1277,6 +1378,23 @@ async function openCandidateSplitScreen(candidateId, jobId) {
       skillsContainer.innerHTML = c.skills.map(s => `<span class="badge badge-gray">${s}</span>`).join('');
     } else {
       skillsContainer.innerHTML = '<span class="text-sm text-mid">No skills listed</span>';
+    }
+    
+    // Custom Fields from importer
+    const customFields = c.customFields || {};
+    const customKeys = Object.keys(customFields).filter(k => customFields[k] && k !== 'location' && k !== 'education');
+    const customSection = document.getElementById('splitCustomFieldsSection');
+    const customContainer = document.getElementById('splitCustomFields');
+    if (customKeys.length > 0) {
+      customSection.style.display = 'block';
+      customContainer.innerHTML = customKeys.map(key => `
+        <div style="background:var(--bg-light); border-radius:8px; padding:10px 14px;">
+          <div style="font-size:11px; font-weight:600; color:var(--text-mid); margin-bottom:4px;">${key}</div>
+          <div style="font-size:13px; color:var(--charcoal); white-space:pre-wrap;">${customFields[key]}</div>
+        </div>
+      `).join('');
+    } else {
+      customSection.style.display = 'none';
     }
     
     // AI Tier View
@@ -1291,11 +1409,28 @@ async function openCandidateSplitScreen(candidateId, jobId) {
     // Render Notes
     renderInternalNotes(c.internalNotes || []);
     
-    // Load CV PDF using fresh SAS URL (avoids expired token issue)
+    // Load CV — handle external link (imported) vs Azure Blob
     const cvContainer = document.getElementById('cvLoadingState');
     const cvEmbed = document.getElementById('cvEmbed');
+    const cvExternalBanner = document.getElementById('cvExternalLinkBanner');
+    const cvExternalLink = document.getElementById('cvExternalLink');
     
-    if (c.cvExtension) {
+    // Reset state
+    cvEmbed.src = '';
+    cvEmbed.style.display = 'block';
+    cvExternalBanner.style.display = 'none';
+    cvContainer.style.display = 'block';
+    
+    const isExternalUrl = c.cvUrl && (c.cvUrl.startsWith('http://') || c.cvUrl.startsWith('https://'));
+    
+    if (isExternalUrl) {
+      // Imported candidate with an external CV URL (e.g. Google Drive link)
+      cvContainer.style.display = 'none';
+      cvEmbed.style.display = 'none';
+      cvExternalBanner.style.display = 'flex';
+      cvExternalLink.href = c.cvUrl;
+    } else if (c.cvExtension) {
+      // Uploaded CV stored in Azure Blob
       try {
         const cvRes = await fetch(`${API_BASE}/jobs/${jobId}/candidates/${candidateId}/cv-url`);
         if (cvRes.ok) {
@@ -1528,9 +1663,13 @@ async function populateJobFilterDropdown() {
       `<option value="${job.id}">${job.title}</option>`
     ).join('');
     
-    // Auto-select current job if available
+    // Auto-select current job if available, otherwise default to first job
     if (window.currentJobId) {
       select.value = window.currentJobId;
+    } else {
+      // Auto-select first job so Rankings auto-loads
+      select.value = jobs[0].id;
+      window.currentJobId = jobs[0].id;
     }
   } catch (error) {
     console.error('Failed to populate job filter:', error);

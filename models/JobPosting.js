@@ -114,6 +114,9 @@ class CandidateApplication {
     // Collaboration & Workflow (Level 1 OS)
     this.isRead = data.isRead || false;
     this.internalNotes = data.internalNotes || []; // {author, text, timestamp}
+    
+    // Custom importer responses
+    this.customFields = data.customFields || {};
   }
 
   toJSON() {
@@ -139,7 +142,8 @@ class CandidateApplication {
       appliedAt: this.appliedAt,
       qualifications: this.qualifications,
       isRead: this.isRead,
-      internalNotes: this.internalNotes
+      internalNotes: this.internalNotes,
+      customFields: this.customFields
     };
   }
 

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhoGPT Agents — AI-Powered Talent Sourcing with African Market Insights</title>
+  <meta name="description" content="WhoGPT Agents uses African talent market insights to help recruiters source right-fit and more interested candidates, faster." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%235776F8'/><circle cx='16' cy='16' r='6' fill='%23FFFFFF'/><circle cx='16' cy='6' r='2.5' fill='%2390DBFF'/><circle cx='24' cy='22' r='2.5' fill='%23FFD099'/><line x1='16' y1='10' x2='16' y2='6' stroke='%23FFFFFF' stroke-width='1.5'/><line x1='20' y1='19' x2='24' y2='22' stroke='%23FFFFFF' stroke-width='1.5'/></svg>" />
+  
+  <!-- Plus Jakarta Sans & Inter Fonts from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Caveat:wght@500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="render-dark-theme">
+  <!-- The Two Outer Framing Lines (Left & Right) Extending Down to the End of the Page -->
+  <div class="page-outer-framing-lines" aria-hidden="true">
+    <div class="page-outer-framing-inner"></div>
+  </div>
+
+  <!-- Slanted Left-Hand Smooth Gradient Background (Render.com inspired) -->
+  <div class="network-background-layer" aria-hidden="true">
+    <div class="render-left-gradient"></div>
+  </div>
+
+  <!-- Header / Navigation (Render.com inspired) -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner container">
+      <!-- 1: Logo with official WhoGPT mark + WhoGPT -->
+      <a href="./index.html" class="brand-wordmark" aria-label="WhoGPT Home">
+        <img src="./whogpt-logo.png" alt="WhoGPT Logo" class="whogpt-logo-img" />
+        <span class="whogpt-logo-text">WhoGPT</span>
+      </a>
+
+      <!-- 2: Navigation Tabs -->
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <a href="#features" class="nav-link"><span>Features</span></a>
+        <a href="#agents" class="nav-link nav-link-agents">
+          <span>Agents</span>
+          <span class="coming-soon-pill">coming soon</span>
+        </a>
+        <a href="#solution" class="nav-link"><span>Solution</span></a>
+        <a href="#resources" class="nav-link"><span>Resources</span></a>
+        <a href="#company" class="nav-link"><span>Company</span></a>
+      </nav>
+
+      <!-- 3: Right Nav Actions (Join the Waitlist & Try for Free box button) -->
+      <div class="nav-actions">
+        <button type="button" class="nav-link-btn" id="navWaitlistBtn"><span>Join the Waitlist</span></button>
+        <a href="./search.html" class="nav-btn-box-white" id="navTryFreeBtn"><span>Try for Free</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainContent">
+    <!-- SECTION 1: HERO (Centered layout inspired by Render) -->
+    <section class="hero-section" id="hero">
+      <div class="container hero-container text-center">
+        <!-- 4: Headline (Centered, Plus Jakarta Sans, vibrant gradient) -->
+        <h1 class="hero-title">
+          Ready to find your next <span class="hero-gradient-text">great hire</span>
+        </h1>
+
+        <!-- Subtitle (Centered, clean muted gray) -->
+        <p class="hero-subtitle">
+          WhoGPT Agents uses African talent market insights to help you source right-fit and more interested candidates, faster.
+        </p>
+
+        <!-- Conversational Search Bar Interface (Centered, sleek dark theme) -->
+        <div class="search-experience-wrapper">
+          <div class="conversational-search-card" id="conversationalSearchBox">
+            <div class="search-input-prefix">
+              <svg class="search-ai-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L14.4 8.6L21 11L14.4 13.4L12 20L9.6 13.4L3 11L9.6 8.6L12 2Z" fill="#C084FC"/>
+                <circle cx="19" cy="5" r="2" fill="#2DD4BF"/>
+              </svg>
+            </div>
+            <input 
+              type="text" 
+              id="heroSearchInput" 
+              class="conversational-input" 
+              placeholder="Describe the candidate you're looking for…" 
+              aria-label="Describe the candidate you're looking for"
+              autocomplete="off"
+            />
+            <button type="button" class="hero-add-criteria-btn" id="heroAddCriteriaBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              <span>Add Criteria</span>
+            </button>
+            <button type="button" class="search-submit-btn" id="heroSearchBtn">
+              <span id="searchBtnLabel">Search</span>
+              <svg id="searchBtnIcon" width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.167 10h11.666m-4.166-4.167L15.834 10l-4.167 4.167" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Active Criteria Tags on Hero -->
+          <div class="hero-active-criteria" id="heroActiveCriteria"></div>
+
+          <!-- Hero Criteria Dropdown Popover -->
+          <div class="criteria-dropdown-popover" id="heroCriteriaDropdown" style="display:none; max-width:680px; margin:0.5rem auto 0; position:relative;">
+            <div class="criteria-dropdown-header">
+              <strong>Target Candidate Criteria</strong>
+              <button type="button" class="criteria-close-btn" id="heroCriteriaCloseBtn">✕</button>
+            </div>
+            <div class="criteria-input-row">
+              <input
+                type="text"
+                id="heroCustomCriteriaInput"
+                class="criteria-text-input"
+                placeholder="e.g. Telecommunication experience, worked across multiple countries…"
+              />
+              <button type="button" class="btn-add-crit" id="heroAddCustomCritBtn">Add</button>
+            </div>
+            <div class="criteria-suggestions-label">Suggested African Market Criteria:</div>
+            <div class="criteria-suggestions-grid">
+              <button type="button" class="crit-pill-sug hero-crit-pill" data-crit="Telecommunications industry experience">＋ Telecommunications</button>
+              <button type="button" class="crit-pill-sug hero-crit-pill" data-crit="Worked across multiple countries / Pan-African">＋ Multi-Country / Pan-African</button>
+              <button type="button" class="crit-pill-sug hero-crit-pill" data-crit="Financial Services & Fintech background">＋ Fintech & Banking</button>
+              <button type="button" class="crit-pill-sug hero-crit-pill" data-crit="Oil & Gas sector experience">＋ Oil & Gas</button>
+              <button type="button" class="crit-pill-sug hero-crit-pill" data-crit="FMCG industry experience">＋ FMCG</button>
+              <button type="button" class="crit-pill-sug hero-crit-pill" data-crit="5+ years proven leadership experience">＋ 5+ Years Experience</button>
+            </div>
+          </div>
+
+          <!-- Clickable Example Searches -->
+          <div class="example-searches">
+            <span class="example-label">Try an example:</span>
+            <div class="example-chips-group">
+              <button type="button" class="example-chip" data-query="Senior Core Banking Engineer in Lagos with 5+ yrs exp">
+                <span class="chip-accent-dot"></span>
+                Senior Core Banking Engineer in Lagos with 5+ yrs exp
+              </button>
+              <button type="button" class="example-chip" data-query="VP of Supply Chain in FMCG across Nigeria">
+                <span class="chip-accent-dot chip-dot-peach"></span>
+                VP of Supply Chain in FMCG across Nigeria
+              </button>
+              <button type="button" class="example-chip" data-query="Chief Risk Officer with Tier-1 Commercial Bank background">
+                <span class="chip-accent-dot chip-dot-cyan"></span>
+                Chief Risk Officer with Tier-1 Commercial Bank background
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: PRODUCT DEMO -->
+    <section class="demo-section" id="demo">
+      <div class="container">
+
+
+        <!-- 16:9 Video Stage (1920x1080) -->
+        <div class="video-stage">
+          <!-- Centered Callout Text (arrow removed) -->
+          <div class="video-callout-center" aria-hidden="true">
+            <span class="video-callout-text">See how WhoGPT works</span>
+          </div>
+
+          <!-- 3: 16:9 Video Frame matching 1920x1080 -->
+          <div class="demo-video-frame" id="demoVideoFrame">
+            <video 
+              id="whogptDemoVideo" 
+              class="demo-video-player"
+              controls 
+              playsinline 
+              preload="metadata"
+            >
+              <source src="./whogpt-demo.mp4" type="video/mp4" />
+              <!-- Google Drive Fallback iframe -->
+              <iframe 
+                src="https://drive.google.com/file/d/1tZkq7swBDXWo5DfxOm719iQsa9obl-O7/preview" 
+                class="demo-video-iframe"
+                allow="autoplay"
+                title="WhoGPT Demo"
+              ></iframe>
+            </video>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: INDUSTRY STATISTICS & MARKET REALITY -->
+    <section class="statistics-section" id="insights">
+      <div class="container">
+        <div class="stats-three-grid">
+          <!-- Stat 1: Time Drain -->
+          <div class="stat-col">
+            <div class="stat-metric-number">30%</div>
+            <p class="stat-problem-reality">of a recruiter's week is wasted manually hunting for resumes.</p>
+            <p class="stat-dream-outcome">WhoGPT searches in seconds so you get hours back to talk to top talent.</p>
+          </div>
+
+          <!-- Stat 2: Cold Outreach -->
+          <div class="stat-col">
+            <div class="stat-metric-number">85%</div>
+            <p class="stat-problem-reality">of cold messages sent to candidates get ignored.</p>
+            <p class="stat-dream-outcome">WhoGPT pinpoints people who are actually open to your role so you get fast, warm replies.</p>
+          </div>
+
+          <!-- Stat 3: Hiring Delay -->
+          <div class="stat-col">
+            <div class="stat-metric-number">50%</div>
+            <p class="stat-problem-reality">is the delay companies face when waiting nearly two months for a single hire.</p>
+            <p class="stat-dream-outcome">WhoGPT cuts your hiring time in half so you fill open roles weeks faster.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: THE 3 RECRUITER PROBLEMS -->
+    <section class="problems-section" id="problems">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2 class="problems-intro-heading">
+            Join the WhoGPT waitlist to be one step closer to solving these 3 problems:
+          </h2>
+        </div>
+
+        <!-- 3 Connected Problem Cards -->
+        <div class="problems-grid">
+          <!-- Card 1 -->
+          <div class="problem-card">
+            <div class="render-step-box">1</div>
+            <div class="problem-outline-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="M21 21l-4.35-4.35"></path>
+                <path d="M11 8v6M8 11h6"></path>
+              </svg>
+            </div>
+            <h3 class="problem-card-title">Finding qualified candidates</h3>
+            <p class="problem-card-desc">
+              Struggling to find enough qualified candidates who match the role.
+            </p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="problem-card">
+            <div class="render-step-box">2</div>
+            <div class="problem-outline-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <h3 class="problem-card-title">Uncertain candidate interest</h3>
+            <p class="problem-card-desc">
+              Uncertainty about which candidates may be open to your opportunity.
+            </p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="problem-card">
+            <div class="render-step-box">3</div>
+            <div class="problem-outline-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6"></path>
+                <path d="M21.5 8A10 10 0 0 0 4.14 6L2.5 8M2.5 16a10 10 0 0 0 17.36 2l1.64-2"></path>
+              </svg>
+            </div>
+            <h3 class="problem-card-title">Wasted sourcing effort</h3>
+            <p class="problem-card-desc">
+              Wasting time sourcing and contacting candidates, only to start over when they drop off.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 5: FINAL CALL TO ACTION -->
+    <section class="final-cta-section" id="waitlistSection">
+      <div class="container">
+        <div class="final-cta-box">
+          <div class="cta-decorative-lines" aria-hidden="true">
+            <svg width="100%" height="100%" viewBox="0 0 800 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+              <line x1="0" y1="50" x2="800" y2="120" stroke="#5776F8" stroke-width="1" stroke-dasharray="4 4" opacity="0.2"/>
+              <line x1="0" y1="250" x2="800" y2="180" stroke="#90DBFF" stroke-width="1" stroke-dasharray="3 3" opacity="0.3"/>
+              <circle cx="200" cy="68" r="4" fill="#5776F8" opacity="0.4"/>
+              <circle cx="650" cy="192" r="5" fill="#FFD099" opacity="0.6"/>
+            </svg>
+          </div>
+
+          <div class="final-cta-content text-center">
+            <h2 class="final-cta-heading">
+              Find the right candidates with greater confidence.
+            </h2>
+            <p class="final-cta-subtitle">
+              Be among the first recruiters to explore how WhoGPT uses African talent market insights to improve candidate sourcing.
+            </p>
+            <div class="final-cta-button-row">
+              <button type="button" class="btn btn-primary btn-xl" id="finalCtaBtn">
+                <span>Join the Waitlist</span>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4.167 10h11.666m-4.166-4.167L15.834 10l-4.167 4.167" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="cta-trust-badges">
+              <span>✓ Focused on Nigerian & African market hubs</span>
+              <span>✓ Tailored for senior & hard-to-fill roles</span>
+              <span>✓ Early access cohort invitation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SECTION 6: FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-top">
+        <div class="footer-brand-col">
+          <a href="#" class="brand-wordmark" aria-label="WhoGPT Agents Home">
+            <img src="./whogpt-logo.png" alt="WhoGPT Logo" class="whogpt-logo-img" style="width: 22px; height: 22px;" />
+            <span class="logo-text">WhoGPT<span class="logo-badge">Agents</span></span>
+          </a>
+          <p class="footer-tagline">
+            AI-powered talent sourcing with African talent market insights.
+          </p>
+        </div>
+
+        <div class="footer-links-col">
+          <h4 class="footer-heading">Platform</h4>
+          <ul class="footer-links-list">
+            <li><a href="#hero">Conversational Search</a></li>
+            <li><a href="#demo">Product Demo</a></li>
+            <li><a href="#problems">Why WhoGPT</a></li>
+            <li><a href="#insights">Market Insights</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-contact-col">
+          <h4 class="footer-heading">Get in Touch</h4>
+          <p class="footer-contact-text">Questions about early access or research partnerships?</p>
+          <a href="mailto:contact@whogpt.ai" class="footer-email-link">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.5 3.5h11a1 1 0 011 1v7a1 1 0 01-1 1h-11a1 1 0 01-1-1v-7a1 1 0 011-1z" stroke="#5776F8" stroke-width="1.2"/>
+              <path d="M2.5 4.5l5.5 4 5.5-4" stroke="#5776F8" stroke-width="1.2"/>
+            </svg>
+            contact@whogpt.ai
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright-text">
+          &copy; 2026 WhoGPT Agents. All rights reserved.
+        </p>
+        <div class="legal-links">
+          <button type="button" class="legal-link-btn" id="privacyBtn">Privacy Policy</button>
+          <span class="legal-separator">•</span>
+          <button type="button" class="legal-link-btn" id="termsBtn">Terms of Service</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+        </div>
+
+        <!-- Career History Timeline -->
+        <div class="drawer-section">
+          <div class="drawer-section-heading">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 6H16V4C16 2.9 15.1 2 14 2H10C8.9 2 8 2.9 8 4V6H4C2.9 6 2 6.9 2 8V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V8C22 6.9 21.1 6 20 6ZM10 4H14V6H10V4ZM20 19H4V8H20V19Z" fill="#5776F8"/></svg>
+            <h4>Career Experience</h4>
+          </div>
+          <div class="timeline-container" id="drawerTimeline">
+            <!-- Timeline items injected -->
+          </div>
+        </div>
+
+        <!-- Education & Skills -->
+        <div class="drawer-section">
+          <div class="drawer-section-heading">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="#5776F8"/></svg>
+            <h4>Education & Verified Skills</h4>
+          </div>
+          <div class="education-list" id="drawerEducation">
+            <!-- Education items -->
+          </div>
+          <div class="skills-chips-wrapper" id="drawerSkills">
+            <!-- Skill pills -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: WAITLIST & EARLY ACCESS SIGNUP
+       ============================================================ -->
+  <div class="modal-backdrop" id="waitlistModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="waitlistModalTitle">
+    <div class="modal-card">
+      <button type="button" class="modal-close-btn" id="closeModalBtn" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- Form View -->
+      <div id="modalFormView">
+        <div class="modal-header">
+          <div class="modal-icon-badge">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L14.4 8.6L21 11L14.4 13.4L12 20L9.6 13.4L3 11L9.6 8.6L12 2Z" fill="#5776F8"/>
+            </svg>
+          </div>
+          <h3 class="modal-title" id="waitlistModalTitle">Join the WhoGPT Waitlist</h3>
+          <p class="modal-subtitle">
+            Be among the first recruiters to source candidates using African talent market insights.
+          </p>
+        </div>
+
+        <form id="waitlistForm" class="waitlist-form">
+          <div class="form-group" id="queryPreviewGroup" style="display: none;">
+            <label class="form-label">Sourcing Prompt Captured:</label>
+            <div class="query-preview-pill" id="modalQueryPreview"></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fullName" class="form-label">Full Name *</label>
+              <input type="text" id="fullName" class="form-input" placeholder="e.g. Amina Bello" required />
+            </div>
+            <div class="form-group">
+              <label for="workEmail" class="form-label">Work Email *</label>
+              <input type="email" id="workEmail" class="form-input" placeholder="amina@company.com" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="companyName" class="form-label">Company or Agency *</label>
+              <input type="text" id="companyName" class="form-input" placeholder="Company Name" required />
+            </div>
+            <div class="form-group">
+              <label for="recruiterType" class="form-label">Recruiting Role *</label>
+              <select id="recruiterType" class="form-select" required>
+                <option value="" disabled selected>Select your profile</option>
+                <option value="In-house Corporate Recruiter">In-house Corporate Recruiter</option>
+                <option value="Recruitment Agency / Headhunter">Recruitment Agency / Headhunter</option>
+                <option value="Executive Search Partner">Executive Search Partner</option>
+                <option value="Hiring Manager / Founder">Hiring Manager / Founder</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="industryFocus" class="form-label">Primary Industries of Interest</label>
+            <select id="industryFocus" class="form-select">
+              <option value="Financial Services & Fintech">Financial Services & Fintech</option>
+              <option value="Technology & Telecommunications">Technology & Telecommunications</option>
+              <option value="Oil & Gas / Energy">Oil & Gas / Energy</option>
+              <option value="FMCG & Consumer Goods">FMCG & Consumer Goods</option>
+              <option value="All Industries / General Search">All Industries / General Search</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitWaitlistBtn">
+            <span>Request Early Access</span>
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.167 10h11.666m-4.166-4.167L15.834 10l-4.167 4.167" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          
+          <p class="form-disclaimer">
+            We respect your privacy. No spam. You will only receive early access updates.
+          </p>
+        </form>
+      </div>
+
+      <!-- Success View -->
+      <div id="modalSuccessView" class="modal-success-state" style="display: none;">
+        <div class="success-icon-circle">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 13L9 17L19 7" stroke="#5776F8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="success-title">You're on the list!</h3>
+        <p class="success-message">
+          Thank you for joining. We've reserved your spot for the initial WhoGPT Agents cohort. We'll be in touch as soon as the next access slots open.
+        </p>
+        <div class="success-badge-card">
+          <span class="badge-tag">Cohort Status</span>
+          <span class="badge-value">Early Access Priority Queue</span>
+        </div>
+        <button type="button" class="btn btn-primary btn-block" id="successDoneBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL: VIDEO EXPLAINER PREVIEW
+       ============================================================ -->
+  <div class="modal-backdrop" id="videoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+    <div class="modal-card modal-video-card">
+      <button type="button" class="modal-close-btn" id="closeVideoModalBtn" aria-label="Close video player">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="modal-header text-left">
+        <h3 class="modal-title" id="videoModalTitle">WhoGPT Agents Walkthrough</h3>
+        <p class="modal-subtitle">AI-assisted candidate search powered by African talent market dynamics</p>
+      </div>
+
+      <!-- Video Player Container (Replace content with iframe / video element) -->
+      <div class="video-embed-container" id="videoEmbedContainer">
+        <div class="video-standin-screen">
+          <div class="video-standin-inner">
+            <div class="standin-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="11" stroke="#5776F8" stroke-width="1.5"/>
+                <path d="M10 8L16 12L10 16V8Z" fill="#5776F8"/>
+              </svg>
+            </div>
+            <h4>Explainer Video Area</h4>
+            <p>Your finished explainer video will play here.</p>
+            <div class="standin-snippet">
+              <code>&lt;!-- Easy Embed: swap this area with your video file or YouTube/Vimeo embed --&gt;</code>
+            </div>
+            <button type="button" class="btn btn-primary" id="videoToWaitlistBtn">Join the Waitlist to See Full Demo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Simple Informational Modal (for Privacy / Terms) -->
+  <div class="modal-backdrop" id="infoModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-card modal-info-card">
+      <button type="button" class="modal-close-btn" id="closeInfoModalBtn" aria-label="Close dialog">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="modal-header text-left">
+        <h3 class="modal-title" id="infoModalTitle">Legal Information</h3>
+        <div class="modal-body-scroll" id="infoModalContent">
+          <p>Full terms and privacy documentation will be published with the public release of WhoGPT Agents. In the interim, all early-access waitlist data is treated with confidentiality and strictly used to notify you of platform availability.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

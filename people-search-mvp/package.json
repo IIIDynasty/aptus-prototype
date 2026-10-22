@@ -1,0 +1,23 @@
+{
+  "name": "people-search-mvp",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"node server.js\" \"vite --host 127.0.0.1 --port 5173\"",
+    "server": "node server.js",
+    "client": "vite --host 127.0.0.1 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "groq-sdk": "^1.6.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "vite": "^8.2.2"
+  }
+}
