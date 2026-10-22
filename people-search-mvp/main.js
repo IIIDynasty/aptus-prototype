@@ -298,5 +298,91 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- Testimonials Automatic Slideshow (Render-Style) ---
+  const testimonialShowcase = document.getElementById('testimonialShowcase');
+  if (testimonialShowcase) {
+    const tabs = testimonialShowcase.querySelectorAll('.testimonial-tab');
+    const slides = testimonialShowcase.querySelectorAll('.testimonial-slide');
+    const SLIDE_DURATION = 7000; // 7 seconds per slide
+    let currentIndex = 0;
+    let remainingTime = SLIDE_DURATION;
+    let isPaused = false;
+    let animationFrameId = null;
+
+    const startProgress = () => {
+      cancelAnimationFrame(animationFrameId);
+
+      const activeFill = tabs[currentIndex]?.querySelector('.tab-progress-fill');
+      const startTimestamp = performance.now();
+      const initialProgress = ((SLIDE_DURATION - remainingTime) / SLIDE_DURATION) * 100;
+
+      const step = (now) => {
+        if (isPaused) return;
+
+        const elapsed = now - startTimestamp;
+        const currentRemaining = Math.max(0, remainingTime - elapsed);
+        const progress = Math.min(100, initialProgress + (elapsed / SLIDE_DURATION) * 100);
+
+        if (activeFill) {
+          activeFill.style.width = `${progress}%`;
+        }
+
+        if (currentRemaining <= 0) {
+          updateSlide((currentIndex + 1) % tabs.length);
+        } else {
+          animationFrameId = requestAnimationFrame(step);
+        }
+      };
+
+      animationFrameId = requestAnimationFrame(step);
+    };
+
+    const updateSlide = (newIndex) => {
+      currentIndex = newIndex;
+
+      tabs.forEach((tab, i) => {
+        const isActive = i === currentIndex;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+
+        const fill = tab.querySelector('.tab-progress-fill');
+        if (fill && !isActive) {
+          fill.style.width = '0%';
+        }
+      });
+
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentIndex);
+      });
+
+      remainingTime = SLIDE_DURATION;
+      startProgress();
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => {
+        updateSlide(index);
+      });
+    });
+
+    testimonialShowcase.addEventListener('mouseenter', () => {
+      isPaused = true;
+      cancelAnimationFrame(animationFrameId);
+    });
+
+    testimonialShowcase.addEventListener('mouseleave', () => {
+      if (isPaused) {
+        isPaused = false;
+        const activeFill = tabs[currentIndex]?.querySelector('.tab-progress-fill');
+        const currentWidthPercent = activeFill ? parseFloat(activeFill.style.width) || 0 : 0;
+        remainingTime = SLIDE_DURATION * (1 - currentWidthPercent / 100);
+        startProgress();
+      }
+    });
+
+    // Initialize first slide
+    updateSlide(0);
+  }
+
   console.log('🚀 [WhoGPT Agents] Landing page initialized.');
 });
