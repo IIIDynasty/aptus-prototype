@@ -3295,9 +3295,21 @@ body.render-dark-theme {
   color: #FFFFFF !important;
   position: relative;
   z-index: 1;
-  padding-top: 3.5rem !important;
+  padding-top: 3rem !important;
   padding-bottom: 3.5rem !important;
   border-bottom: none !important;
+}
+
+.render-dark-theme .statistics-intro-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem) !important;
+  font-weight: 500 !important;
+  color: #FFFFFF !important;
+  line-height: 1.35 !important;
+  max-width: 720px;
+  margin: 0 auto 3.25rem auto !important; /* Pushes the 3 columns down with generous, clean margin */
+  text-align: center;
+  letter-spacing: -0.02em;
 }
 
 .render-dark-theme .stats-three-grid {
@@ -3330,8 +3342,18 @@ body.render-dark-theme {
   font-size: 1.05rem !important;
   line-height: 1.55 !important;
   font-weight: 400 !important;
-  margin-bottom: 0.85rem !important;
+  margin-bottom: 0.65rem !important;
   letter-spacing: -0.01em !important;
+}
+
+.render-dark-theme .stat-source-ref {
+  display: block !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.72rem !important;
+  color: rgba(255, 255, 255, 0.4) !important; /* Very small text and faint color as requested */
+  letter-spacing: 0.02em !important;
+  margin-bottom: 0.95rem !important;
+  font-weight: 400 !important;
 }
 
 .render-dark-theme .stat-dream-outcome {
